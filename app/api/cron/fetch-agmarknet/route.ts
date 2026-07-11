@@ -135,8 +135,47 @@ export async function GET(req: NextRequest) {
         break;
       }
 
+      // Fetch all existing records for the target date from DB in a single query
+      const parsedDate = parseArrivalDate(targetDate);
+      const existingDbRecords = await prisma.mandiPrice.findMany({
+        where: {
+          date: parsedDate,
+        },
+      });
+
+      // Build maps for fast lookups in memory
+      const manualRecordsMap = new Set<string>();
+      const apiRecordsMap = new Map<string, number>();
+
+      for (const r of existingDbRecords) {
+        const key = `${r.state.toLowerCase()}|${r.district.toLowerCase()}|${r.mandi.toLowerCase()}|${r.crop.toLowerCase()}`;
+        if (r.source === "manual_verified") {
+          manualRecordsMap.add(key);
+        } else if (r.source === "agmarknet_api") {
+          apiRecordsMap.set(key, r.id);
+        }
+      }
+
+      const inserts: {
+        state: string;
+        district: string;
+        mandi: string;
+        crop: string;
+        date: Date;
+        minPrice: number;
+        maxPrice: number;
+        modalPrice: number;
+        source: string;
+      }[] = [];
+      
+      const updates: {
+        id: number;
+        minPrice: number;
+        maxPrice: number;
+        modalPrice: number;
+      }[] = [];
+
       for (const record of records) {
-        // Ensure values are parsed correctly
         const state = record.state ? String(record.state).trim() : "";
         const district = record.district ? String(record.district).trim() : "";
         const mandi = record.market ? String(record.market).trim() : "";
@@ -150,65 +189,67 @@ export async function GET(req: NextRequest) {
         const minPrice = parseFloat(record.min_price) || 0;
         const maxPrice = parseFloat(record.max_price) || 0;
         const modalPrice = parseFloat(record.modal_price) || 0;
-        const parsedDate = parseArrivalDate(record.arrival_date);
 
-        // 1. Check if manually-verified data takes priority in MP (same crop, mandi, district, date)
-        if (state.toLowerCase() === "madhya pradesh") {
-          const manualRecord = await prisma.mandiPrice.findFirst({
-            where: {
-              state: "Madhya Pradesh",
-              district,
-              mandi,
-              crop,
-              date: parsedDate,
-              source: "manual_verified",
-            },
-          });
+        const key = `${state.toLowerCase()}|${district.toLowerCase()}|${mandi.toLowerCase()}|${crop.toLowerCase()}`;
 
-          if (manualRecord) {
-            skippedCount++;
-            continue; // Skip overwriting manual priority
-          }
+        // 1. Check if manually-verified data takes priority in MP
+        if (state.toLowerCase() === "madhya pradesh" && manualRecordsMap.has(key)) {
+          skippedCount++;
+          continue;
         }
 
-        // 2. Check if API record already exists to perform upsert manually
-        const existingApiRecord = await prisma.mandiPrice.findFirst({
-          where: {
+        // 2. Check if API record already exists to perform update, otherwise insert
+        const existingId = apiRecordsMap.get(key);
+        if (existingId !== undefined) {
+          updates.push({
+            id: existingId,
+            minPrice,
+            maxPrice,
+            modalPrice,
+          });
+        } else {
+          inserts.push({
             state,
             district,
             mandi,
             crop,
             date: parsedDate,
+            minPrice,
+            maxPrice,
+            modalPrice,
             source: "agmarknet_api",
-          },
-        });
-
-        if (existingApiRecord) {
-          await prisma.mandiPrice.update({
-            where: { id: existingApiRecord.id },
-            data: {
-              minPrice,
-              maxPrice,
-              modalPrice,
-            },
           });
-          updatedCount++;
-        } else {
-          await prisma.mandiPrice.create({
-            data: {
-              state,
-              district,
-              mandi,
-              crop,
-              date: parsedDate,
-              minPrice,
-              maxPrice,
-              modalPrice,
-              source: "agmarknet_api",
-            },
-          });
-          savedCount++;
         }
+      }
+
+      // Batch execute insertions
+      if (inserts.length > 0) {
+        await prisma.mandiPrice.createMany({
+          data: inserts,
+          skipDuplicates: true,
+        });
+        savedCount += inserts.length;
+      }
+
+      // Batch execute updates in chunks of 100 to prevent deadlock locks
+      if (updates.length > 0) {
+        const batchSize = 100;
+        for (let i = 0; i < updates.length; i += batchSize) {
+          const chunk = updates.slice(i, i + batchSize);
+          await prisma.$transaction(
+            chunk.map((up) =>
+              prisma.mandiPrice.update({
+                where: { id: up.id },
+                data: {
+                  minPrice: up.minPrice,
+                  maxPrice: up.maxPrice,
+                  modalPrice: up.modalPrice,
+                },
+              })
+            )
+          );
+        }
+        updatedCount += updates.length;
       }
 
       // If we fetched fewer records than the limit, we've reached the end
