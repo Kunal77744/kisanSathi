@@ -151,15 +151,19 @@ export async function getMandiPrices(params: MandiQueryParams) {
   return { priceRecords, totalMatchingCount, totalPages, isDbEmpty };
 }
 
+// Threshold constants for crop advisory (Phase 2)
+export const ADVISORY_RISING_THRESHOLD = 5;
+export const ADVISORY_FALLING_THRESHOLD = -5;
+
 export async function getPriceTrend(
   state: string,
   district: string,
   mandi: string,
   crop: string,
+  currentModalPrice: number,
   currentDate: Date
-): Promise<{ changePercent: number | null; direction: "up" | "down" | "flat" | null }> {
+): Promise<{ direction: "up" | "down" | "flat"; changePercent: number; previousDate: Date } | null> {
   try {
-    // start of current date
     const startOfDay = new Date(currentDate);
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -183,45 +187,36 @@ export async function getPriceTrend(
       },
     });
 
-    if (!priorRecord) {
-      return { changePercent: null, direction: null };
+    if (!priorRecord || priorRecord.modalPrice === 0) {
+      return null;
     }
 
-    // Find the current record to compare against
-    const currentRecord = await prisma.mandiPrice.findFirst({
-      where: {
-        state,
-        district,
-        mandi,
-        crop,
-        date: {
-          gte: startOfDay,
-          lte: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000 - 1),
-        },
-      },
-    });
-
-    if (!currentRecord) {
-      return { changePercent: null, direction: null };
-    }
-
-    const currentPrice = currentRecord.modalPrice;
-    const priorPrice = priorRecord.modalPrice;
-
-    if (priorPrice === 0) {
-      return { changePercent: null, direction: null };
-    }
-
-    const diff = currentPrice - priorPrice;
-    const changePercent = Math.round((diff / priorPrice) * 100 * 10) / 10;
+    const previousModalPrice = priorRecord.modalPrice;
+    const diff = currentModalPrice - previousModalPrice;
+    const changePercent = Math.round((diff / previousModalPrice) * 100 * 10) / 10;
 
     let direction: "up" | "down" | "flat" = "flat";
     if (diff > 0) direction = "up";
     else if (diff < 0) direction = "down";
 
-    return { changePercent, direction };
+    return {
+      direction,
+      changePercent,
+      previousDate: priorRecord.date,
+    };
   } catch (error) {
     console.error("[Price Trend Calculation Error]:", error);
-    return { changePercent: null, direction: null };
+    return null;
   }
 }
+
+export function getAdvisoryLabel(percentChange: number, lang: "en" | "hi" = "hi"): string {
+  if (percentChange > ADVISORY_RISING_THRESHOLD) {
+    return lang === "hi" ? "रुकें — भाव बढ़ रहा है" : "Hold — Price Rising";
+  }
+  if (percentChange < ADVISORY_FALLING_THRESHOLD) {
+    return lang === "hi" ? "अभी बेचें — भाव गिर रहा है" : "Sell Now — Price Falling";
+  }
+  return lang === "hi" ? "स्थिर भाव" : "Stable Price";
+}
+

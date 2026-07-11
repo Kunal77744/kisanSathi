@@ -10,11 +10,14 @@ import {
 import { SITE_URL } from "@/lib/config";
 import { slugify } from "@/lib/utils";
 
+import { getAdvisoryLabel } from "@/lib/mandiQueries";
+
 interface PriceCardProps {
   record: MandiPrice;
   trend?: {
-    changePercent: number | null;
-    direction: "up" | "down" | "flat" | null;
+    changePercent: number;
+    direction: "up" | "down" | "flat";
+    previousDate?: Date;
   } | null;
 }
 
@@ -83,24 +86,29 @@ export default function PriceCard({ record, trend }: PriceCardProps) {
             
             {/* Trend Indicator */}
             {trend && trend.changePercent !== null && trend.direction && (
-              <div
-                className={`px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-0.5 border ${
-                  trend.direction === "up"
-                    ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30"
-                    : trend.direction === "down"
-                    ? "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/30"
-                    : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-800"
-                }`}
-              >
-                {trend.direction === "up" ? (
-                  <ArrowUpRight className="h-3 w-3" />
-                ) : trend.direction === "down" ? (
-                  <ArrowDownRight className="h-3 w-3" />
-                ) : (
-                  <Minus className="h-3 w-3" />
-                )}
-                <span>
-                  {trend.direction === "flat" ? "स्थिर" : `${Math.abs(trend.changePercent)}%`}
+              <div className="flex flex-col items-end gap-0.5">
+                <div
+                  className={`px-2 py-0.5 rounded-lg text-2xs font-bold flex items-center gap-0.5 border ${
+                    trend.direction === "up"
+                      ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30"
+                      : trend.direction === "down"
+                      ? "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/30"
+                      : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-805"
+                  }`}
+                >
+                  {trend.direction === "up" ? (
+                    <ArrowUpRight className="h-3 w-3" />
+                  ) : trend.direction === "down" ? (
+                    <ArrowDownRight className="h-3 w-3" />
+                  ) : (
+                    <Minus className="h-3 w-3" />
+                  )}
+                  <span>
+                    {trend.direction === "flat" ? "स्थिर" : `${Math.abs(trend.changePercent)}%`}
+                  </span>
+                </div>
+                <span className="text-[10px] font-black text-stone-500 dark:text-stone-400 uppercase tracking-tight leading-none mt-0.5">
+                  {getAdvisoryLabel(trend.changePercent, "hi")}
                 </span>
               </div>
             )}

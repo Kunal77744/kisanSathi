@@ -111,6 +111,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
         record.district,
         record.mandi,
         record.crop,
+        record.modalPrice,
         record.date
       );
       return { record, trend };

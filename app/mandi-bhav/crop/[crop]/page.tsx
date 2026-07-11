@@ -95,6 +95,7 @@ export default async function CropMandiPage({ params }: RouteParams) {
         record.district,
         record.mandi,
         record.crop,
+        record.modalPrice,
         record.date
       );
       return { record, trend };
