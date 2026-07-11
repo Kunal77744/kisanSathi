@@ -1,29 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import { Wheat, BadgeAlert, BadgeCheck, RotateCcw, PlusCircle, Globe } from "lucide-react";
+import { Wheat, BadgeAlert, RotateCcw, PlusCircle, Globe } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
-import {
-  translateCrop,
-  translateDistrict,
-  translateMandi,
-  translateState,
-} from "@/lib/cropTranslations";
 import MandiFilters from "@/components/mandi-bhav/MandiFilters";
 import MandiTable from "@/components/mandi-bhav/MandiTable";
-import { redis } from "@/lib/redis";
-import { MandiPrice } from "@prisma/client";
 import { slugify } from "@/lib/utils";
-
-interface CachedMandiPrice extends Omit<MandiPrice, "date" | "createdAt"> {
-  date: string;
-  createdAt: string;
-}
-
-interface CachedData {
-  priceRecords: CachedMandiPrice[];
-  totalMatchingCount: number;
-}
+import { getMandiPrices } from "@/lib/mandiQueries";
+import PriceCard from "@/components/mandi-bhav/PriceCard";
 
 
 
@@ -110,6 +94,17 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
   // Parse page number and set page size limit
   const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10));
   const pageSize = 30;
+  
+  // 2. Fetch price records matching filter criteria via shared getMandiPrices query logic
+  const { priceRecords, totalMatchingCount, totalPages, isDbEmpty } = await getMandiPrices({
+    state: selectedState,
+    district: selectedDistrict,
+    mandi: selectedMandi,
+    crop: selectedCrop,
+    date: selectedDate,
+    page: currentPage,
+    pageSize,
+  });
 
   // 1. Fetch unique lists from DB for the filters concurrently via getCachedFilters cache
   const { distinctStates, distinctDistricts, distinctMandis, distinctCrops } = await getCachedFilters();
@@ -125,112 +120,6 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
   ];
 
   const noFiltersActive = !selectedState && !selectedDistrict && !selectedMandi && !selectedCrop;
-
-  // 2. Fetch price records matching filter criteria with pagination limits
-  const where: {
-    state?: string;
-    district?: string;
-    mandi?: string;
-    crop?: string;
-    OR?: Array<{ state: string; mandi: string }>;
-    date?: { gte: Date; lte: Date };
-  } = {};
-
-  // Split selectedDate for boundary ranges (capture any midday UTC imports accurately)
-  const [year, month, day] = selectedDate.split("-").map(Number);
-  const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-  const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-
-  where.date = {
-    gte: startOfDay,
-    lte: endOfDay,
-  };
-
-  if (noFiltersActive) {
-    // Show only featured/top mandis by default instead of all India
-    where.OR = [
-      { state: "Madhya Pradesh", mandi: "Indore" },
-      { state: "Madhya Pradesh", mandi: "Bhopal" },
-      { state: "Madhya Pradesh", mandi: "Dhamnod" },
-      { state: "Madhya Pradesh", mandi: "Pipariya" },
-      { state: "Maharashtra", mandi: "Pune APMC" },
-      { state: "Maharashtra", mandi: "Lasalgaon" },
-      { state: "Uttar Pradesh", mandi: "Agra Mandi" },
-      { state: "Haryana", mandi: "Ambala APMC" },
-    ];
-  } else {
-    if (selectedState) {
-      where.state = selectedState;
-    }
-    if (selectedDistrict) {
-      where.district = selectedDistrict;
-    }
-    if (selectedMandi) {
-      where.mandi = selectedMandi;
-    }
-    if (selectedCrop) {
-      where.crop = selectedCrop;
-    }
-  }
-
-  let priceRecords: MandiPrice[] = [];
-  let totalMatchingCount = 0;
-  let cacheHit = false;
-
-  const cacheKey = `mandi:${selectedState || "all"}:${selectedDistrict || "all"}:${selectedMandi || "all"}:${selectedCrop || "all"}:${selectedDate}:${currentPage}`;
-
-  if (redis) {
-    try {
-      const cached = await redis.get<CachedData>(cacheKey);
-      if (cached) {
-        const data = typeof cached === "string" ? (JSON.parse(cached) as CachedData) : cached;
-        if (data && Array.isArray(data.priceRecords)) {
-          priceRecords = data.priceRecords.map((r: CachedMandiPrice) => ({
-            ...r,
-            date: r.date ? new Date(r.date) : new Date(),
-            createdAt: r.createdAt ? new Date(r.createdAt) : new Date(),
-          })) as MandiPrice[];
-          totalMatchingCount = data.totalMatchingCount;
-          cacheHit = true;
-          console.log(`[Cache Hit] Redis key: ${cacheKey}`);
-        }
-      }
-    } catch (err) {
-      console.error("[Redis Cache Read Error]:", err);
-    }
-  }
-
-  if (!cacheHit) {
-    priceRecords = await prisma.mandiPrice.findMany({
-      where,
-      orderBy: { date: "desc" },
-      skip: (currentPage - 1) * pageSize,
-      take: pageSize,
-    });
-
-    totalMatchingCount = await prisma.mandiPrice.count({
-      where,
-    });
-
-    if (redis) {
-      try {
-        await redis.set(
-          cacheKey,
-          JSON.stringify({ priceRecords, totalMatchingCount }),
-          { ex: 3600 }
-        );
-        console.log(`[Cache Miss - Populated] Redis key: ${cacheKey}`);
-      } catch (err) {
-        console.error("[Redis Cache Write Error]:", err);
-      }
-    }
-  }
-
-  const totalPages = Math.ceil(totalMatchingCount / pageSize);
-
-  // Check if database is empty overall
-  const totalCount = await prisma.mandiPrice.count();
-  const isDbEmpty = totalCount === 0;
 
   // Helper to build URL with query params for pagination
   const buildPageUrl = (pageNumber: number) => {
@@ -260,8 +149,35 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
 
   const displayHindiDate = formatHindiDate(selectedDate);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "किसान साथी पर मंडी भाव की जानकारी कैसे देखें?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "आप राज्य, जिला, मंडी या फसल का चयन करके सीधे खोज बार और फिल्टर का उपयोग कर सकते हैं। इसके अलावा हमारे पास प्रत्येक जिले और फसल के लिए समर्पित पृष्ठ भी हैं।"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "मंडी भाव का डेटा कब अपडेट होता है?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "हमारा डेटा प्रतिदिन सरकारी Agmarknet सर्वर और स्थानीय प्रतिनिधियों द्वारा लाइव अपडेट किया जाता है।"
+        }
+      }
+    ]
+  };
+
   return (
     <div className="flex-grow bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header Block */}
@@ -408,96 +324,9 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             {selectedView === "card" ? (
               /* CARD VIEW LAYOUT (Default) */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {priceRecords.map((record) => {
-                  const cropHindi = translateCrop(record.crop, "hi");
-                  const districtHindi = translateDistrict(record.district, "hi");
-                  const mandiHindi = translateMandi(record.mandi, "hi");
-                  const stateHindi = translateState(record.state, "hi");
-                  
-                  const displayDate = record.date
-                    ? new Date(record.date).toISOString().split("T")[0]
-                    : new Date().toISOString().split("T")[0];
-
-                  const isManualVerified = record.source === "manual_verified";
-
-                  return (
-                    <div
-                      key={record.id}
-                      className="card-kisan flex flex-col justify-between hover:scale-[1.01] transition-transform duration-200"
-                    >
-                      <div className="space-y-4">
-                        {/* Card Header */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h3 className="text-2xl font-extrabold text-kisan-green-800 dark:text-kisan-green-400">
-                              {cropHindi}
-                            </h3>
-                          </div>
-                          
-                          {isManualVerified ? (
-                            <div className="bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-700 dark:text-kisan-green-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-kisan-green-100 dark:border-kisan-green-900/30">
-                              <BadgeCheck className="h-4 w-4 shrink-0" />
-                              <span>✓ सत्यापित</span>
-                            </div>
-                          ) : (
-                            <div className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-amber-100 dark:border-amber-900/30">
-                              <Globe className="h-4 w-4 shrink-0" />
-                              <span>स्रोत: Agmarknet</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Mandi, District & State Details */}
-                        <div className="grid grid-cols-2 gap-4 border-y border-stone-100 dark:border-stone-850 py-3">
-                          <div>
-                            <span className="text-xs font-semibold text-stone-500">मंडी (Market)</span>
-                            <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">
-                              {mandiHindi}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-xs font-semibold text-stone-500">स्थान (Location)</span>
-                            <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">
-                              {districtHindi}, {stateHindi}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Prices Grid */}
-                        <div className="space-y-2">
-                          <span className="text-xs font-semibold text-stone-500 block">भाव विवरण (Rates per Quintal)</span>
-                          
-                          <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="bg-stone-50 dark:bg-stone-950/30 p-2.5 rounded-xl border border-stone-100 dark:border-stone-850/50">
-                              <span className="text-2xs font-bold text-stone-500 block">न्यूनतम</span>
-                              <p className="font-mono font-bold text-stone-800 dark:text-stone-300 text-sm mt-0.5">
-                                ₹{record.minPrice}
-                              </p>
-                            </div>
-                            <div className="bg-stone-50 dark:bg-stone-950/30 p-2.5 rounded-xl border border-stone-100 dark:border-stone-850/50">
-                              <span className="text-2xs font-bold text-stone-500 block">अधिकतम</span>
-                              <p className="font-mono font-bold text-stone-800 dark:text-stone-300 text-sm mt-0.5">
-                                ₹{record.maxPrice}
-                              </p>
-                            </div>
-                            <div className="bg-kisan-green-50/30 dark:bg-kisan-green-950/10 p-2.5 rounded-xl border border-kisan-green-100/30 dark:border-kisan-green-900/10">
-                              <span className="text-2xs font-bold text-kisan-green-700 dark:text-kisan-green-400 block">औसत भाव</span>
-                              <p className="font-mono font-extrabold text-kisan-green-800 dark:text-kisan-green-450 text-base mt-0.5">
-                                ₹{record.modalPrice}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card Footer */}
-                      <div className="text-2xs text-stone-500 dark:text-stone-400 font-mono mt-4 pt-3 border-t border-stone-100 dark:border-stone-850/40 flex items-center justify-between">
-                        <span>दर दिनांक (Rate Date):</span>
-                        <span className="font-bold">{displayDate}</span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {priceRecords.map((record) => (
+                  <PriceCard key={record.id} record={record} />
+                ))}
               </div>
             ) : (
               /* TABLE VIEW LAYOUT */
@@ -554,22 +383,22 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
                 📍 लोकप्रिय मंडियां (Popular Mandis)
               </h3>
               <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-stone-605 dark:text-stone-300">
-                <Link href="/mandi-bhav?state=Madhya+Pradesh&district=Indore&mandi=Indore" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/madhya-pradesh/indore" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   इंदौर मंडी भाव
                 </Link>
-                <Link href="/mandi-bhav?state=Madhya+Pradesh&district=Bhopal&mandi=Bhopal" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/madhya-pradesh/bhopal" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   भोपाल मंडी भाव
                 </Link>
-                <Link href="/mandi-bhav?state=Madhya+Pradesh&district=Dhar&mandi=Dhamnod" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/madhya-pradesh/dhar" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   धामनोद मंडी भाव
                 </Link>
-                <Link href="/mandi-bhav?state=Maharashtra&district=Pune&mandi=Pune+APMC" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/maharashtra/pune" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   पुणे मंडी भाव
                 </Link>
-                <Link href="/mandi-bhav?state=Maharashtra&district=Nashik&mandi=Lasalgaon" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/maharashtra/nashik" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   लासलगांव प्याज भाव
                 </Link>
-                <Link href="/mandi-bhav?state=Uttar+Pradesh&district=Agra&mandi=Agra+Mandi" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/uttar-pradesh/agra" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   आगरा मंडी भाव
                 </Link>
               </div>
@@ -581,23 +410,23 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
                 🌾 लोकप्रिय फसलें (Popular Crops)
               </h3>
               <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-stone-605 dark:text-stone-300">
-                <Link href="/mandi-bhav?crop=Wheat" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/crop/wheat" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   गेहूं का ताजा भाव
                 </Link>
-                <Link href="/mandi-bhav?crop=Soybean" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/crop/soybean" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   सोयाबीन बाजार दर
                 </Link>
-                <Link href="/mandi-bhav?crop=Paddy" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/crop/paddy" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   धान / चावल के भाव
                 </Link>
-                <Link href="/mandi-bhav?crop=Gram" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/crop/gram" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   चना मंडी भाव
                 </Link>
-                <Link href="/mandi-bhav?crop=Garlic" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                <Link href="/mandi-bhav/crop/garlic" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
                   लहसुन के भाव
                 </Link>
-                <Link href="/mandi-bhav?crop=Onion" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
-                   प्याज का मंडी भाव
+                <Link href="/mandi-bhav/crop/onion" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400 hover:underline">
+                  प्याज का मंडी भाव
                 </Link>
               </div>
             </div>
