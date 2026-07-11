@@ -1,0 +1,30 @@
+// Prisma schema for KisanSathi Local SQLite Database
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model MandiPrice {
+  id         Int      @id @default(autoincrement())
+  state      String   @default("Madhya Pradesh")
+  district   String
+  mandi      String
+  crop       String
+  date       DateTime @default(now())
+  minPrice   Float
+  maxPrice   Float
+  modalPrice Float
+  source     String   @default("manual_verified")
+  createdAt  DateTime @default(now())
+
+  @@index([state])
+  @@index([district])
+  @@index([mandi])
+  @@index([crop])
+  @@index([date])
+}

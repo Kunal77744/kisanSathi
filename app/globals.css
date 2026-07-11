@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fbf9f4; /* kisan.cream.100 */
+  --foreground: #111a14; /* kisan.green.950 */
+}
+
+.dark {
+  --background: #0b140f; /* very dark green-grey */
+  --foreground: #f2e8e5; /* kisan.earth.100 */
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Custom interactive styles for farmer accessibility */
+.btn-primary {
+  @apply bg-kisan-green-700 hover:bg-kisan-green-800 text-white font-medium px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 duration-200 text-lg md:text-xl flex items-center justify-center gap-2;
+}
+
+.btn-secondary {
+  @apply bg-kisan-cream-200 hover:bg-kisan-cream-300 text-kisan-green-900 border border-kisan-cream-300 font-medium px-6 py-3 rounded-xl shadow-sm transition-all active:scale-95 duration-200 text-lg md:text-xl flex items-center justify-center gap-2;
+}
+
+.card-kisan {
+  @apply bg-white dark:bg-kisan-green-950/20 border border-kisan-cream-200 dark:border-kisan-green-900/30 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+/* Pure CSS lightweight animations for SEO/SSR compliance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+

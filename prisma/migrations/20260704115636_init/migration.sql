@@ -1,0 +1,12 @@
+-- CreateTable
+CREATE TABLE "MandiPrice" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "district" TEXT NOT NULL,
+    "mandi" TEXT NOT NULL,
+    "crop" TEXT NOT NULL,
+    "date" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "minPrice" REAL NOT NULL,
+    "maxPrice" REAL NOT NULL,
+    "modalPrice" REAL NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
