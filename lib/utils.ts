@@ -21,3 +21,15 @@ export function cn(...inputs: (string | undefined | null | boolean | {[key: stri
 
   return classes.join(" ");
 }
+
+/**
+ * Generates a URL-safe lowercase slug from a string (e.g. "Madhya Pradesh" -> "madhya-pradesh")
+ */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

@@ -211,21 +211,25 @@ export default function Home() {
             </div>
 
             {/* Weather Snippet */}
-            <div className="card-kisan space-y-4">
+            <Link
+              href="/weather"
+              className="card-kisan space-y-4 hover:-translate-y-1.5 duration-300 block cursor-pointer"
+            >
               <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
                 <span className="text-xs font-bold text-stone-500 uppercase">मौसम पूर्वानुमान</span>
                 <span className="text-xs bg-kisan-yellow-100 text-kisan-yellow-800 px-2 py-0.5 rounded font-bold">Soon</span>
               </div>
               <div className="space-y-1">
-                <h4 className="text-xl font-bold text-stone-900 dark:text-white">जल्द आ रहा है</h4>
-                <p className="text-sm text-stone-605 dark:text-stone-300">
-                  मौसम की सटीक जानकारी एवं बारिश के पूर्वानुमान की सेवा जल्द उपलब्ध होगी।
+                <h4 className="text-xl font-bold text-stone-900 dark:text-white">मौसम पूर्वानुमान</h4>
+                <p className="text-sm text-stone-600 dark:text-stone-300">
+                  भारत के सभी जिलों का सटीक मौसम पूर्वानुमान और कृषि सलाह देखें।
                 </p>
               </div>
-              <div className="text-sm text-kisan-yellow-700 font-semibold pt-1">
-                <span>Coming Soon</span>
+              <div className="text-sm text-kisan-yellow-700 font-semibold pt-1 flex items-center gap-1">
+                <span>खोलें / Explore</span>
+                <ArrowRight className="h-4 w-4" />
               </div>
-            </div>
+            </Link>
 
             {/* Latest Scheme */}
             {/* TODO: Replace with real live data */}

@@ -13,6 +13,7 @@ import MandiFilters from "@/components/mandi-bhav/MandiFilters";
 import MandiTable from "@/components/mandi-bhav/MandiTable";
 import { redis } from "@/lib/redis";
 import { MandiPrice } from "@prisma/client";
+import { slugify } from "@/lib/utils";
 
 interface CachedMandiPrice extends Omit<MandiPrice, "date" | "createdAt"> {
   date: string;
@@ -326,6 +327,17 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
                   ? "अन्य राज्यों और मंडियों के भाव देखने के लिए ऊपर दिए गए फ़िल्टर का उपयोग करें।"
                   : `दिखा रहे हैं ${Math.min((currentPage - 1) * pageSize + 1, totalMatchingCount)} - ${Math.min(currentPage * pageSize, totalMatchingCount)}`}
               </span>
+              {!noFiltersActive && selectedState && selectedDistrict && (
+                <div className="mt-2">
+                  <Link
+                    href={`/weather/${slugify(selectedState)}/${slugify(selectedDistrict)}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg bg-kisan-green-50 dark:bg-kisan-green-950/20 text-kisan-green-700 dark:text-kisan-green-400 border border-kisan-green-200/30 hover:bg-kisan-green-100 transition-all min-h-[32px]"
+                  >
+                    <span>इस जिले का मौसम देखें (View Weather)</span>
+                    <Globe className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Desktop / Tablet / Mobile View Toggle */}
