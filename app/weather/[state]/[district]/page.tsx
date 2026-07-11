@@ -117,17 +117,22 @@ export default async function DistrictWeatherPage({ params }: RouteParams) {
   const humidity = weather.current.relative_humidity_2m;
   const advisories = getFarmerAdvisory(weather.daily, "hi");
 
-  // Check if MandiPrices exist for this state + district
-  const hasMandiData = await prisma.mandiPrice.findFirst({
-    where: {
-      state: {
-        contains: state,
+  // Check if MandiPrices exist for this state + district (wrap in try-catch to be build-resilient if db is offline)
+  let hasMandiData = null;
+  try {
+    hasMandiData = await prisma.mandiPrice.findFirst({
+      where: {
+        state: {
+          contains: state,
+        },
+        district: {
+          contains: district,
+        },
       },
-      district: {
-        contains: district,
-      },
-    },
-  });
+    });
+  } catch (dbError) {
+    console.warn(`[Weather DB Check Warning] Could not query mandi prices for ${district}, ${state}:`, dbError);
+  }
 
   // Find 5 other districts in the same state
   const otherDistricts = districtsData
