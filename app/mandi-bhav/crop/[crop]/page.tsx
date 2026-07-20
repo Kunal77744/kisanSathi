@@ -7,6 +7,7 @@ import { slugify } from "@/lib/utils";
 import { getPriceTrend } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
 import { translateCrop } from "@/lib/cropTranslations";
+import { buildCropPageMetadata, resolveCropBySlug } from "@/lib/cropPageMetadata";
 
 export const dynamicParams = true;
 export const revalidate = 10800; // 3 hours
@@ -38,21 +39,20 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: RouteParams) {
   const cropParam = params.crop;
 
-  // Resolve matching crop name from DB list
   const distinctCrops = await prisma.mandiPrice.findMany({
     select: { crop: true },
     distinct: ["crop"],
   });
-  const matchedCrop = distinctCrops.find((c) => slugify(c.crop) === cropParam)?.crop || cropParam;
-  const cropHindi = translateCrop(matchedCrop, "hi");
+  const matchedCrop = resolveCropBySlug(
+    distinctCrops.map(({ crop }) => crop),
+    cropParam
+  );
 
-  return {
-    title: `${cropHindi} (Wheat/Soybean) का आज का मंडी भाव - ताज़ा बाजार दरें | kisanSathi`,
-    description: `भारत की प्रमुख कृषि मंडियों में ${cropHindi} का आज का ताज़ा रेट देखें। राज्यों और शहरों के अनुसार दरों की तुलना करें और उच्चतम एवं न्यूनतम भाव जानें।`,
-    alternates: {
-      canonical: `/mandi-bhav/crop/${cropParam}`,
-    },
-  };
+  if (!matchedCrop) {
+    notFound();
+  }
+
+  return buildCropPageMetadata(matchedCrop);
 }
 
 export default async function CropMandiPage({ params }: RouteParams) {
@@ -63,7 +63,10 @@ export default async function CropMandiPage({ params }: RouteParams) {
     select: { crop: true },
     distinct: ["crop"],
   });
-  const matchedCrop = distinctCrops.find((c) => slugify(c.crop) === cropParam)?.crop;
+  const matchedCrop = resolveCropBySlug(
+    distinctCrops.map(({ crop }) => crop),
+    cropParam
+  );
 
   if (!matchedCrop) {
     notFound();
