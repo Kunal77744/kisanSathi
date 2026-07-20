@@ -16,8 +16,8 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "मंडी भाव - वास्तविक समय फसल दरें",
-  description: "मध्यप्रदेश और देश की अन्य मंडियों के वास्तविक समय के फसल भाव और बाजार दरें देखें।",
+  title: "मंडी भाव - नवीनतम उपलब्ध फसल दरें",
+  description: "मध्यप्रदेश और देश की अन्य मंडियों के नवीनतम उपलब्ध फसल भाव, स्रोत और अपडेट की तारीख देखें।",
 };
 
 // Cache the filters dropdown lists to avoid running 4 expensive distinct DB queries on every request.
@@ -89,22 +89,23 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
   const selectedMandi = searchParams.mandi || "";
   const selectedCrop = searchParams.crop || "";
   const selectedView = searchParams.view === "table" ? "table" : "card";
-  const selectedDate = searchParams.date || getTodayLocalDateString();
+  const requestedDate = searchParams.date;
   
   // Parse page number and set page size limit
   const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10));
   const pageSize = 30;
   
   // 2. Fetch price records matching filter criteria via shared getMandiPrices query logic
-  const { priceRecords, totalMatchingCount, totalPages, isDbEmpty } = await getMandiPrices({
+  const { priceRecords, totalMatchingCount, totalPages, isDbEmpty, dataDate, usedLatestAvailable } = await getMandiPrices({
     state: selectedState,
     district: selectedDistrict,
     mandi: selectedMandi,
     crop: selectedCrop,
-    date: selectedDate,
+    date: requestedDate,
     page: currentPage,
     pageSize,
   });
+  const selectedDate = requestedDate || dataDate || getTodayLocalDateString();
 
   // 1. Fetch unique lists from DB for the filters concurrently via getCachedFilters cache
   const { distinctStates, distinctDistricts, distinctMandis, distinctCrops } = await getCachedFilters();
@@ -166,7 +167,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
         "name": "मंडी भाव का डेटा कब अपडेट होता है?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "हमारा डेटा प्रतिदिन सरकारी Agmarknet सर्वर और स्थानीय प्रतिनिधियों द्वारा लाइव अपडेट किया जाता है।"
+          "text": "हम नवीनतम उपलब्ध सरकारी Agmarknet और सत्यापित स्थानीय डेटा दिखाते हैं। हर भाव के साथ उपलब्ध डेटा की तारीख दी जाती है।"
         }
       }
     ]
@@ -185,7 +186,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
           <div className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-extrabold text-kisan-green-800 dark:text-kisan-green-400 flex items-center gap-2.5">
               <Wheat className="h-9 w-9" />
-              <span>मंडी भाव - लाइव बाजार दरें / Mandi Bhav</span>
+              <span>मंडी भाव - नवीनतम उपलब्ध दरें / Mandi Bhav</span>
             </h1>
             <p className="text-stone-600 dark:text-stone-400 text-base md:text-lg">
               मध्यप्रदेश (सत्यापित) और सरकारी Agmarknet API से देश की मंडियों के फसल भाव।
@@ -226,6 +227,12 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             <span className="text-xs font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-3 py-1 rounded-full border border-stone-250/20">
               {noFiltersActive ? "चुनिंदा मंडियां" : "खोज परिणाम"}
             </span>
+          </div>
+        )}
+
+        {usedLatestAvailable && !isDbEmpty && (
+          <div className="rounded-xl border border-kisan-yellow-200/60 bg-kisan-yellow-50/70 px-4 py-3 text-sm font-semibold text-stone-700 dark:border-kisan-yellow-900/30 dark:bg-kisan-yellow-950/10 dark:text-stone-300">
+            सरकारी स्रोत में आज का डेटा उपलब्ध नहीं है। नीचे {displayHindiDate} का नवीनतम उपलब्ध डेटा दिखाया गया है।
           </div>
         )}
 

@@ -6,12 +6,48 @@ import { redis } from "@/lib/redis";
 // Force dynamic execution for API endpoints that shouldn't be statically generated
 export const dynamic = "force-dynamic";
 
-function getTodayStr(): string {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yyyy = d.getFullYear();
+function formatDateForApi(d: Date): string {
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const yyyy = d.getUTCFullYear();
   return `${dd}/${mm}/${yyyy}`;
+}
+
+function getTodayStr(): string {
+  const dateParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(dateParts.map((part) => [part.type, part.value]));
+  const year = Number(values.year);
+  const month = Number(values.month);
+  const day = Number(values.day);
+  return formatDateForApi(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function subtractDays(dateStr: string, days: number): string {
+  const date = parseArrivalDate(dateStr);
+  date.setUTCDate(date.getUTCDate() - days);
+  return formatDateForApi(date);
+}
+
+async function fetchAgmarknetRecords(apiKey: string, date: string, limit: number, offset: number) {
+  const url = new URL("https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070");
+  url.searchParams.set("api-key", apiKey);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("offset", String(offset));
+  url.searchParams.set("filters[arrival_date]", date);
+
+  const response = await fetch(url, { next: { revalidate: 0 } });
+  if (!response.ok) {
+    throw new Error(`Agmarknet API responded with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data.records) ? data.records : [];
 }
 
 function parseArrivalDate(dateStr: string): Date {
@@ -54,7 +90,40 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const targetDate = searchParams.get("date") || getTodayStr();
+    const requestedDate = searchParams.get("date");
+    const today = getTodayStr();
+    let targetDate = requestedDate || today;
+
+    // Agmarknet often publishes after a delay. For the scheduled run, find the
+    // newest available source date instead of silently succeeding on an empty
+    // current-day response. An explicit admin date remains exact.
+    if (!requestedDate && apiKey !== "mock_test_key") {
+      const maxLookbackDays = 31;
+      let foundAvailableDate = false;
+
+      for (let daysAgo = 0; daysAgo <= maxLookbackDays; daysAgo++) {
+        const candidateDate = subtractDays(today, daysAgo);
+        const sample = await fetchAgmarknetRecords(apiKey, candidateDate, 1, 0);
+        if (sample.length > 0) {
+          targetDate = candidateDate;
+          foundAvailableDate = true;
+          break;
+        }
+      }
+
+      if (!foundAvailableDate) {
+        return NextResponse.json({
+          success: true,
+          requestedDate: today,
+          sourceDate: null,
+          sourceDelayedDays: null,
+          saved: 0,
+          updated: 0,
+          skipped: 0,
+          warning: `No Agmarknet records were available in the last ${maxLookbackDays} days`,
+        });
+      }
+    }
     
     // We paginate using limit/offset since data.gov.in limits the records count returned in a single call
     let offset = 0;
@@ -114,19 +183,8 @@ export async function GET(req: NextRequest) {
           records = [];
         }
       } else {
-        const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&limit=${limit}&offset=${offset}&filters[arrival_date]=${targetDate}`;
         console.log(`Fetching offset ${offset} from Agmarknet API...`);
-        
-        const response = await fetch(url, {
-          next: { revalidate: 0 }, // bypass Next fetch cache
-        });
-
-        if (!response.ok) {
-          throw new Error(`Agmarknet API responded with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        records = data.records || [];
+        records = await fetchAgmarknetRecords(apiKey, targetDate, limit, offset);
       }
 
       if (records.length === 0) {
@@ -292,7 +350,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      date: targetDate,
+      requestedDate: requestedDate || today,
+      sourceDate: targetDate,
+      sourceDelayedDays: requestedDate
+        ? null
+        : Math.round((parseArrivalDate(today).getTime() - parseArrivalDate(targetDate).getTime()) / 86_400_000),
       saved: savedCount,
       updated: updatedCount,
       skipped: skippedCount,
