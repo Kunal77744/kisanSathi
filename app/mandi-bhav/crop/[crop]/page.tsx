@@ -1,13 +1,20 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, ArrowLeft, TrendingUp } from "lucide-react";
+import { ChevronRight, ArrowLeft, TrendingUp, HelpCircle, MapPin } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { getPriceTrend } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
-import { translateCrop } from "@/lib/cropTranslations";
+import { translateCrop, translateDistrict, translateState } from "@/lib/cropTranslations";
 import { buildCropPageMetadata, resolveCropBySlug } from "@/lib/cropPageMetadata";
+import {
+  buildCropFaq,
+  buildCropSummary,
+  buildLatestCropSnapshot,
+  formatHindiDate,
+} from "@/lib/cropPageContent";
+import { SITE_URL } from "@/lib/config";
 
 export const dynamicParams = true;
 export const revalidate = 10800; // 3 hours
@@ -87,8 +94,32 @@ export default async function CropMandiPage({ params }: RouteParams) {
     take: 100,
   });
 
-  // Sort by modalPrice desc in memory to ensure highest rates are absolutely pinned to the top
-  const sortedRecords = [...priceRecords].sort((a, b) => b.modalPrice - a.modalPrice);
+  const snapshot = buildLatestCropSnapshot(priceRecords);
+  const sortedRecords = snapshot
+    ? [...snapshot.records].sort((a, b) => b.modalPrice - a.modalPrice)
+    : [];
+
+  const relatedCropRecords = snapshot
+    ? await prisma.mandiPrice.findMany({
+        where: {
+          state: { in: snapshot.states },
+          crop: { not: matchedCrop },
+        },
+        select: { crop: true },
+        distinct: ["crop"],
+        orderBy: { crop: "asc" },
+        take: 6,
+      })
+    : [];
+
+  const districtLinks = Array.from(
+    new Map(
+      sortedRecords.map((record) => [
+        `${record.state}|${record.district}`,
+        { state: record.state, district: record.district },
+      ])
+    ).values()
+  ).slice(0, 6);
 
   // Compute trends for the records shown
   const priceRecordsWithTrends = await Promise.all(
@@ -105,28 +136,65 @@ export default async function CropMandiPage({ params }: RouteParams) {
     })
   );
 
-  const displayDate = sortedRecords[0]?.date
-    ? new Date(sortedRecords[0].date).toISOString().split("T")[0]
-    : new Date().toISOString().split("T")[0];
-
-  // Helper to format Hindi display dates
-  const formatHindiDate = (dateStr: string) => {
-    const parts = dateStr.split("-").map(Number);
-    if (parts.length !== 3 || isNaN(parts[0])) return dateStr;
-    const [y, m, d] = parts;
-    const monthsHindi = [
-      "जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून",
-      "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"
-    ];
-    return `${d} ${monthsHindi[m - 1]} ${y}`;
+  const cropSummary = snapshot ? buildCropSummary(cropHindi, snapshot) : null;
+  const faqQuestions = snapshot ? buildCropFaq(cropHindi, snapshot) : [];
+  const cropUrl = `${SITE_URL}/mandi-bhav/crop/${cropParam}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "मुख्य पृष्ठ",
+            item: SITE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "मंडी भाव",
+            item: `${SITE_URL}/mandi-bhav`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: `${cropHindi} मंडी भाव`,
+            item: cropUrl,
+          },
+        ],
+      },
+      ...(faqQuestions.length > 0
+        ? [
+            {
+              "@type": "FAQPage",
+              mainEntity: faqQuestions.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer,
+                },
+              })),
+            },
+          ]
+        : []),
+    ],
   };
 
   return (
     <div className="min-h-screen bg-kisan-cream-100 dark:bg-stone-950 py-10 px-4 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Navigation Breadcrumb */}
-        <nav className="text-sm font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 select-none">
+        <nav aria-label="Breadcrumb" className="text-sm font-bold text-stone-500 dark:text-stone-400 flex flex-wrap items-center gap-2 select-none">
           <Link href="/" className="hover:text-kisan-green-700 dark:hover:text-kisan-green-400">
             मुख्य पृष्ठ
           </Link>
@@ -152,7 +220,7 @@ export default async function CropMandiPage({ params }: RouteParams) {
               <span>🌾 {cropHindi} मंडी भाव आज का रेट</span>
             </h1>
             <p className="text-base text-stone-500">
-              भारत की विभिन्न मंडियों में {cropHindi} के आज के भाव (उच्चतम भाव सबसे ऊपर)
+              नवीनतम उपलब्ध तारीख के भाव, उच्चतम प्रचलित भाव पहले
             </p>
           </div>
           
@@ -166,14 +234,20 @@ export default async function CropMandiPage({ params }: RouteParams) {
         </div>
 
         {/* Description Overview Card */}
-        <div className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/15 rounded-3xl p-6 shadow-2xs space-y-2">
-          <p className="text-base sm:text-lg text-stone-700 dark:text-stone-300 leading-relaxed font-semibold">
-            इस पेज पर {cropHindi} फसल की देश भर की प्रमुख मंडियों (जैसे मध्य प्रदेश, महाराष्ट्र, उत्तर प्रदेश) के आज के ताज़ा दाम प्रदर्शित हैं। किसानों की सुविधा के लिए हमने दरों को उच्चतम भाव के क्रम में व्यवस्थित किया है ताकि आप जान सकें कि किस मंडी में सबसे अधिक मूल्य मिल रहा है।
-          </p>
-          <div className="text-xs text-stone-400 font-bold">
-            डेटा अपडेट दिनांक: {formatHindiDate(displayDate)}
-          </div>
-        </div>
+        {snapshot && cropSummary && (
+          <section className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/15 rounded-3xl p-6 sm:p-8 shadow-2xs space-y-3">
+            <div className="flex items-center gap-2 text-kisan-green-700 dark:text-kisan-green-400 font-bold text-sm">
+              <TrendingUp className="h-4.5 w-4.5" />
+              <span>नवीनतम मूल्य सारांश</span>
+            </div>
+            <p className="max-w-[65ch] text-base sm:text-lg text-stone-700 dark:text-stone-300 leading-relaxed font-semibold">
+              {cropSummary}
+            </p>
+            <div className="text-xs text-stone-500 dark:text-stone-400 font-bold">
+              अंतिम उपलब्ध तारीख: {formatHindiDate(snapshot.date)}
+            </div>
+          </section>
+        )}
 
         {/* Main Price Grid */}
         {sortedRecords.length === 0 ? (
@@ -185,10 +259,82 @@ export default async function CropMandiPage({ params }: RouteParams) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-            {priceRecordsWithTrends.map(({ record, trend }) => (
-              <PriceCard key={record.id} record={record} trend={trend} />
-            ))}
+          <section className="space-y-5">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-white">
+              {formatHindiDate(snapshot!.date)} के मंडी भाव
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+              {priceRecordsWithTrends.map(({ record, trend }) => (
+                <PriceCard key={record.id} record={record} trend={trend} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {snapshot && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
+            <section className="lg:col-span-2 bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/15 rounded-3xl p-6 sm:p-8 shadow-2xs space-y-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white flex items-center gap-2">
+                <HelpCircle className="h-5.5 w-5.5 text-kisan-green-700" />
+                <span>{cropHindi} मंडी भाव के सवाल</span>
+              </h2>
+              <div className="space-y-6">
+                {faqQuestions.map((item) => (
+                  <div key={item.question} className="space-y-2">
+                    <h3 className="text-base sm:text-lg font-bold text-stone-900 dark:text-white">
+                      {item.question}
+                    </h3>
+                    <p className="max-w-[65ch] text-sm sm:text-base text-stone-600 dark:text-stone-400 leading-relaxed">
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <aside className="space-y-6">
+              {districtLinks.length > 0 && (
+                <section className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/15 rounded-3xl p-6 shadow-2xs space-y-4">
+                  <h2 className="text-base font-bold text-stone-900 dark:text-white flex items-center gap-2">
+                    <MapPin className="h-4.5 w-4.5 text-kisan-green-700" />
+                    <span>इन जिलों के भाव देखें</span>
+                  </h2>
+                  <div className="flex flex-col gap-2">
+                    {districtLinks.map(({ state, district }) => (
+                      <Link
+                        key={`${state}|${district}`}
+                        href={`/mandi-bhav/${slugify(state)}/${slugify(district)}`}
+                        className="flex items-center justify-between min-h-[44px] rounded-xl bg-stone-50 dark:bg-stone-950 px-3 py-2.5 text-sm font-bold text-stone-700 dark:text-stone-300 hover:bg-kisan-green-50 dark:hover:bg-kisan-green-950/20 transition-colors"
+                      >
+                        <span>{translateDistrict(district, "hi")}</span>
+                        <span className="text-xs font-semibold text-stone-400">
+                          {translateState(state, "hi")}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {relatedCropRecords.length > 0 && (
+                <section className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/15 rounded-3xl p-6 shadow-2xs space-y-4">
+                  <h2 className="text-base font-bold text-stone-900 dark:text-white">
+                    संबंधित फसलों के भाव
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {relatedCropRecords.map(({ crop }) => (
+                      <Link
+                        key={crop}
+                        href={`/mandi-bhav/crop/${slugify(crop)}`}
+                        className="inline-flex min-h-[44px] items-center rounded-xl border border-kisan-cream-200 dark:border-stone-800 px-3 py-2 text-sm font-bold text-kisan-green-700 dark:text-kisan-green-400 hover:bg-kisan-green-50 dark:hover:bg-kisan-green-950/20 transition-colors"
+                      >
+                        {translateCrop(crop, "hi")}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </aside>
           </div>
         )}
 
