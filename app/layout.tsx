@@ -6,6 +6,7 @@ import Footer from "@/components/shared/Footer";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Analytics } from "@vercel/analytics/react";
 import { SITE_URL, SUPPORT_EMAIL } from "@/lib/config";
+import PostHogAnalyticsProvider from "@/components/analytics/PostHogAnalyticsProvider";
 
 // Configure Poppins font for English layout
 const poppins = Poppins({
@@ -108,17 +109,19 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${notoSansDevanagari.variable} font-sans antialiased bg-kisan-cream-100 dark:bg-kisan-green-950/20 text-stone-900 dark:text-stone-100 min-h-screen flex flex-col`}
       >
-        <ThemeProvider>
-          <Header />
-          
-          {/* Main Content Shell */}
-          <main className="flex-grow flex flex-col">
-            {children}
-          </main>
-          
-          <Footer />
-          <Analytics />
-        </ThemeProvider>
+        <PostHogAnalyticsProvider>
+          <ThemeProvider>
+            <Header />
+
+            {/* Main Content Shell */}
+            <main className="flex-grow flex flex-col">
+              {children}
+            </main>
+
+            <Footer />
+            <Analytics />
+          </ThemeProvider>
+        </PostHogAnalyticsProvider>
       </body>
     </html>
   );
