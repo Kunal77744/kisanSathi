@@ -112,9 +112,26 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-stone-800 pt-8 mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-stone-500 text-sm text-center md:text-left">
-            &copy; {currentYear} KisanSathi. Designed for Indian Farmers. All rights reserved.
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-stone-500 text-sm md:justify-start">
+            <p className="text-center md:text-left">
+              &copy; {currentYear} KisanSathi. Designed for Indian Farmers. All rights reserved.
+            </p>
+            <a
+              href="https://tin.computer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-stone-400 transition-colors"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 32 32"
+                className="h-[1em] w-[1em] shrink-0"
+              >
+                <rect width="32" height="32" fill="#66DC9D" />
+              </svg>
+              Growth by Tin
+            </a>
+          </div>
           <div className="flex gap-6 text-sm text-stone-500">
             <Link href="/privacy" className="hover:text-stone-400 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-stone-400 transition-colors">Terms of Service</Link>

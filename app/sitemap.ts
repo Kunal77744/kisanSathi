@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     "",
     "/mandi-bhav",
+    "/kisan-sathi",
     "/schemes",
     "/weather",
     "/news",
