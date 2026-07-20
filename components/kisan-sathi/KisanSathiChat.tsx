@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageSquareText, Send, RefreshCw, AlertCircle, User, Cpu } from "lucide-react";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 
 interface Message {
   role: "user" | "assistant";
@@ -10,6 +11,7 @@ interface Message {
 }
 
 export default function KisanSathiChat() {
+  const posthog = usePostHog();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -33,9 +35,15 @@ export default function KisanSathiChat() {
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
+    const turnNumber = messages.filter((message) => message.role === "user").length + 1;
     setInput("");
     setError("");
     setLoading(true);
+
+    // Track the interaction state only. The farmer's question is never sent to analytics.
+    posthog.capture("assistant_question_submitted", {
+      turn_number: turnNumber,
+    });
 
     // Append user message locally
     const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }];
@@ -63,11 +71,22 @@ export default function KisanSathiChat() {
 
       if (res.ok && data.success) {
         setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
+        posthog.capture("assistant_answer_received", {
+          turn_number: turnNumber,
+        });
       } else {
         setError(data.error || "संदेश भेजने में विफल। कृपया पुन: प्रयास करें। (Failed to send message. Please try again)");
+        posthog.capture("assistant_request_failed", {
+          turn_number: turnNumber,
+          failure_type: "api_response",
+        });
       }
     } catch (err) {
       setError("सर्वर से संपर्क करने में असमर्थ। (Failed to connect to the server)");
+      posthog.capture("assistant_request_failed", {
+        turn_number: turnNumber,
+        failure_type: "network_or_parse",
+      });
       console.error(err);
     } finally {
       setLoading(false);
