@@ -217,7 +217,7 @@ export default function Home() {
             >
               <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
                 <span className="text-xs font-bold text-stone-500 uppercase">मौसम पूर्वानुमान</span>
-                <span className="text-xs bg-kisan-yellow-100 text-kisan-yellow-800 px-2 py-0.5 rounded font-bold">Soon</span>
+                <span className="text-xs bg-kisan-green-100 text-kisan-green-800 px-2 py-0.5 rounded font-bold">उपलब्ध / Available</span>
               </div>
               <div className="space-y-1">
                 <h4 className="text-xl font-bold text-stone-900 dark:text-white">मौसम पूर्वानुमान</h4>
