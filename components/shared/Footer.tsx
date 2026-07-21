@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Sprout, Phone, Mail, MapPin, ExternalLink } from "lucide-react";
-import { getObfuscatedEmailHtml } from "@/lib/config";
+import { SUPPORT_EMAIL } from "@/lib/config";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -101,10 +101,12 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-kisan-green-500 shrink-0" />
-                <span 
-                  className="text-stone-400 text-base"
-                  dangerouslySetInnerHTML={{ __html: getObfuscatedEmailHtml() }}
-                />
+                <a
+                  href={`mailto:${SUPPORT_EMAIL}`}
+                  className="break-all rounded-sm text-base text-stone-400 transition-colors duration-200 hover:text-kisan-green-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kisan-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
+                >
+                  {SUPPORT_EMAIL}
+                </a>
               </li>
             </ul>
           </div>
