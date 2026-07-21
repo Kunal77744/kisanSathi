@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { redis } from "@/lib/redis";
-import { MandiPrice } from "@prisma/client";
+import { MandiPrice, Prisma } from "@prisma/client";
 
 export interface MandiQueryParams {
   state?: string;
@@ -10,6 +10,17 @@ export interface MandiQueryParams {
   date?: string; // YYYY-MM-DD
   page?: number;
   pageSize?: number;
+}
+
+export function getTodayInIndiaDateString(now = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
 interface CachedMandiPrice extends Omit<MandiPrice, "date" | "createdAt"> {
@@ -28,39 +39,17 @@ export async function getMandiPrices(params: MandiQueryParams) {
   const selectedMandi = params.mandi || "";
   const selectedCrop = params.crop || "";
   
-  // Default to today's date if not specified
-  const getTodayLocalDateString = () => {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
-  const selectedDate = params.date || getTodayLocalDateString();
+  // A chosen date is exact. Without one, show the newest source date that
+  // actually has data for the selected filters instead of an empty "today".
+  const requestedDate = params.date || "";
+  const todayInIndia = getTodayInIndiaDateString();
   
   const currentPage = Math.max(1, params.page || 1);
   const pageSize = params.pageSize || 30;
 
   const noFiltersActive = !selectedState && !selectedDistrict && !selectedMandi && !selectedCrop;
 
-  const where: {
-    state?: string;
-    district?: string;
-    mandi?: string;
-    crop?: string;
-    OR?: Array<{ state: string; mandi: string }>;
-    date?: { gte: Date; lte: Date };
-  } = {};
-
-  // Split selectedDate for boundary ranges (capture any midday UTC imports accurately)
-  const [year, month, day] = selectedDate.split("-").map(Number);
-  const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-  const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-
-  where.date = {
-    gte: startOfDay,
-    lte: endOfDay,
-  };
+  const where: Prisma.MandiPriceWhereInput = {};
 
   if (noFiltersActive) {
     // Show only featured/top mandis by default instead of all India
@@ -88,6 +77,28 @@ export async function getMandiPrices(params: MandiQueryParams) {
       where.crop = selectedCrop;
     }
   }
+
+  const latestMatchingRecord = requestedDate
+    ? null
+    : await prisma.mandiPrice.findFirst({
+        where,
+        orderBy: { date: "desc" },
+        select: { date: true },
+      });
+
+  const selectedDate = requestedDate || (latestMatchingRecord
+    ? `${latestMatchingRecord.date.getUTCFullYear()}-${String(latestMatchingRecord.date.getUTCMonth() + 1).padStart(2, "0")}-${String(latestMatchingRecord.date.getUTCDate()).padStart(2, "0")}`
+    : todayInIndia);
+
+  // Split selectedDate for boundary ranges (capture any midday UTC imports accurately)
+  const [year, month, day] = selectedDate.split("-").map(Number);
+  const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+  const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+
+  where.date = {
+    gte: startOfDay,
+    lte: endOfDay,
+  };
 
   let priceRecords: MandiPrice[] = [];
   let totalMatchingCount = 0;
@@ -148,7 +159,15 @@ export async function getMandiPrices(params: MandiQueryParams) {
   const totalCount = await prisma.mandiPrice.count();
   const isDbEmpty = totalCount === 0;
 
-  return { priceRecords, totalMatchingCount, totalPages, isDbEmpty };
+  return {
+    priceRecords,
+    totalMatchingCount,
+    totalPages,
+    isDbEmpty,
+    dataDate: selectedDate,
+    usedLatestAvailable:
+      !requestedDate && Boolean(latestMatchingRecord) && selectedDate < todayInIndia,
+  };
 }
 
 // Threshold constants for crop advisory (Phase 2)
@@ -219,4 +238,3 @@ export function getAdvisoryLabel(percentChange: number, lang: "en" | "hi" = "hi"
   }
   return lang === "hi" ? "स्थिर भाव" : "Stable Price";
 }
-
