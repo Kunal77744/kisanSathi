@@ -6,6 +6,7 @@ import { priorityDistricts } from "@/lib/priorityDistricts";
 import { slugify } from "@/lib/utils";
 import { SITE_URL } from "@/lib/config";
 import { prisma } from "@/lib/db";
+import { TRUSTED_MANDI_SOURCES } from "@/lib/mandiArchiveQueries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
@@ -13,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     "",
     "/mandi-bhav",
+    "/mandi-bhav/archive",
     "/kisan-sathi",
     "/schemes",
     "/weather",
@@ -66,6 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Mandi Bhav Crop pages
   let mandiCropPages: MetadataRoute.Sitemap = [];
   let mandiDistrictPages: MetadataRoute.Sitemap = [];
+  let mandiArchivePages: MetadataRoute.Sitemap = [];
 
   try {
     const dbCrops = await prisma.mandiPrice.findMany({
@@ -98,6 +101,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "daily" as const,
         priority: 0.6,
       }));
+
+    // 4. Exact-date archive pages. A page needs at least two verified rows so
+    // thin or empty combinations never enter the search index.
+    const [cropDateGroups, districtDateGroups] = await Promise.all([
+      prisma.mandiPrice.groupBy({
+        by: ["date", "crop"],
+        where: { source: { in: TRUSTED_MANDI_SOURCES } },
+        _count: { id: true },
+        orderBy: { date: "desc" },
+      }),
+      prisma.mandiPrice.groupBy({
+        by: ["date", "state", "district"],
+        where: { source: { in: TRUSTED_MANDI_SOURCES } },
+        _count: { id: true },
+        orderBy: { date: "desc" },
+      }),
+    ]);
+
+    const archiveCropPages = cropDateGroups
+      .filter((item) => item._count.id >= 2 && item.crop)
+      .slice(0, 2000)
+      .map((item) => ({
+        url: `${baseUrl}/mandi-bhav/archive/${item.date.toISOString().slice(0, 10)}/crop/${slugify(item.crop)}`,
+        lastModified: item.date,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+
+    const archiveDistrictPages = districtDateGroups
+      .filter((item) => item._count.id >= 2 && item.state && item.district)
+      .slice(0, 2000)
+      .map((item) => ({
+        url: `${baseUrl}/mandi-bhav/archive/${item.date.toISOString().slice(0, 10)}/${slugify(item.state)}/${slugify(item.district)}`,
+        lastModified: item.date,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+
+    mandiArchivePages = [...archiveCropPages, ...archiveDistrictPages];
   } catch (error) {
     console.error("[Sitemap DB Query Warning]: Database query failed during sitemap generation", error);
   }
@@ -111,5 +153,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...mandiStatePages,
     ...mandiCropPages,
     ...mandiDistrictPages,
+    ...mandiArchivePages,
   ];
 }
