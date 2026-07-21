@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: RouteParams) {
 
   if (!match) {
     return {
-      title: "मंडी भाव आज का रेट - किसान साथी (Mandi Bhav | KisanSathi)",
+      title: "नवीनतम उपलब्ध मंडी भाव - किसान साथी (Mandi Bhav | KisanSathi)",
     };
   }
 
@@ -68,8 +68,8 @@ export async function generateMetadata({ params }: RouteParams) {
   const stateHindi = translateState(state, "hi");
 
   return {
-    title: `${districtHindi} (${district}) मंडी भाव आज का रेट - ${stateHindi} | kisanSathi`,
-    description: `${districtHindi} मंडी भाव आज का रेट: ${districtHindi} में गेहूं, सोयाबीन, चना, मक्का के ताज़ा बाजार भाव, दैनिक आवक दरें और साप्ताहिक उतार-चढ़ाव देखें।`,
+    title: `${districtHindi} (${district}) नवीनतम उपलब्ध मंडी भाव - ${stateHindi} | kisanSathi`,
+    description: `${districtHindi} मंडी भाव: ${districtHindi} में गेहूं, सोयाबीन, चना, मक्का के नवीनतम उपलब्ध बाजार भाव, स्रोत तारीख और साप्ताहिक उतार-चढ़ाव देखें।`,
     alternates: {
       canonical: `/mandi-bhav/${stateParam}/${districtParam}`,
     },
@@ -95,7 +95,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
   const stateHindi = translateState(state, "hi");
 
   // Fetch prices using the shared query helper
-  const { priceRecords } = await getMandiPrices({
+  const { priceRecords, dataDate, usedLatestAvailable } = await getMandiPrices({
     state: state,
     district: district,
     date: dateParam || undefined,
@@ -118,9 +118,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
     })
   );
 
-  const displayDate = priceRecords[0]?.date
-    ? new Date(priceRecords[0].date).toISOString().split("T")[0]
-    : dateParam || new Date().toISOString().split("T")[0];
+  const displayDate = dataDate;
 
   // Helper to format Hindi display dates
   const formatHindiDate = (dateStr: string) => {
@@ -139,7 +137,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
   const distinctMandisHindi = Array.from(new Set(priceRecords.map(r => translateMandi(r.mandi, "hi"))));
 
   const descriptionHindi = priceRecords.length > 0
-    ? `यह पृष्ठ ${districtHindi} (जिला ${stateHindi}) क्षेत्र के ताज़ा मंडी भाव प्रदर्शित करता है। आज दिनांक ${formatHindiDate(displayDate)} को ${distinctMandisHindi.join(", ")} जैसी प्रमुख कृषि मंडियों में ${distinctCropsHindi.join(", ")} आदि फसलों की आवक दर्ज की गई। सरकारी स्रोतों से प्राप्त आंकड़ों के अनुसार, दरों में नियमित बदलाव देखने को मिल रहा है।`
+    ? `यह पृष्ठ ${districtHindi} (जिला ${stateHindi}) क्षेत्र के नवीनतम उपलब्ध मंडी भाव प्रदर्शित करता है। ${formatHindiDate(displayDate)} को ${distinctMandisHindi.join(", ")} जैसी प्रमुख कृषि मंडियों में ${distinctCropsHindi.join(", ")} आदि फसलों की आवक दर्ज की गई। सरकारी स्रोतों से प्राप्त आंकड़ों के अनुसार, दरों में नियमित बदलाव देखने को मिल रहा है।`
     : `${districtHindi} (${stateHindi}) क्षेत्र के लिए चुनिंदा तिथि ${formatHindiDate(displayDate)} का मंडी दर डेटा वर्तमान में उपलब्ध नहीं है। मंडी में नई आवक होने पर नवीनतम भाव यहाँ अपडेट किए जाएंगे।`;
 
   // Find nearby districts in the same state
@@ -155,10 +153,10 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
   // JSON-LD FAQ Schema
   const faqQuestions = [
     {
-      question: `${districtHindi} में आज फसल मंडी भाव क्या है?`,
+      question: `${districtHindi} में नवीनतम उपलब्ध फसल मंडी भाव क्या है?`,
       answer: priceRecords.length > 0
-        ? `${districtHindi} में आज ${distinctCropsHindi.slice(0, 3).join(", ")} जैसी फसलें बिक रही हैं। मुख्य फसलों का औसत भाव जानने के लिए ऊपर दी गई दर तालिका देखें।`
-        : `${districtHindi} की मंडियों में आज का आधिकारिक भाव प्राप्त होते ही यहाँ अपडेट किया जाएगा।`
+        ? `${districtHindi} में ${formatHindiDate(displayDate)} के नवीनतम उपलब्ध रिकॉर्ड में ${distinctCropsHindi.slice(0, 3).join(", ")} जैसी फसलें शामिल हैं। मुख्य फसलों का औसत भाव जानने के लिए ऊपर दी गई दर तालिका देखें।`
+        : `${districtHindi} की मंडियों का आधिकारिक भाव प्राप्त होते ही यहाँ अपडेट किया जाएगा।`
     },
     {
       question: `किसान साथी पर मंडी दरों का स्रोत क्या है?`,
@@ -211,7 +209,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-kisan-cream-200 dark:border-kisan-green-900/10 pb-6">
           <div className="space-y-2">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
-              📍 {districtHindi} मंडी भाव आज का रेट
+              📍 {districtHindi} नवीनतम उपलब्ध मंडी भाव
             </h1>
             <p className="text-base text-stone-500">
               जिला: {districtHindi} | राज्य: {stateHindi}
@@ -254,6 +252,12 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
           </div>
         </div>
 
+        {usedLatestAvailable && priceRecords.length > 0 && (
+          <div className="rounded-xl border border-kisan-yellow-200/60 bg-kisan-yellow-50/70 px-4 py-3 text-sm font-semibold text-stone-700 dark:border-kisan-yellow-900/30 dark:bg-kisan-yellow-950/10 dark:text-stone-300">
+            सरकारी स्रोत में आज का डेटा उपलब्ध नहीं है। नीचे {formatHindiDate(displayDate)} का नवीनतम उपलब्ध डेटा दिखाया गया है।
+          </div>
+        )}
+
         {/* Main Price Records Container */}
         {priceRecords.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/10 rounded-3xl space-y-4">
@@ -268,7 +272,7 @@ export default async function DistrictMandiPage({ params, searchParams }: RouteP
         ) : (
           <div className="space-y-6">
             <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-white flex items-center gap-2 select-none">
-              <span>🌾 ताज़ा फसल कीमतें (Current Rates)</span>
+              <span>🌾 नवीनतम उपलब्ध फसल कीमतें (Latest Available Rates)</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {priceRecordsWithTrends.map(({ record, trend }) => (

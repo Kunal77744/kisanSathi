@@ -12,6 +12,17 @@ export interface MandiQueryParams {
   pageSize?: number;
 }
 
+export function getTodayInIndiaDateString(now = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 interface CachedMandiPrice extends Omit<MandiPrice, "date" | "createdAt"> {
   date: string;
   createdAt: string;
@@ -30,14 +41,8 @@ export async function getMandiPrices(params: MandiQueryParams) {
   
   // A chosen date is exact. Without one, show the newest source date that
   // actually has data for the selected filters instead of an empty "today".
-  const getTodayLocalDateString = () => {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
   const requestedDate = params.date || "";
+  const todayInIndia = getTodayInIndiaDateString();
   
   const currentPage = Math.max(1, params.page || 1);
   const pageSize = params.pageSize || 30;
@@ -83,7 +88,7 @@ export async function getMandiPrices(params: MandiQueryParams) {
 
   const selectedDate = requestedDate || (latestMatchingRecord
     ? `${latestMatchingRecord.date.getUTCFullYear()}-${String(latestMatchingRecord.date.getUTCMonth() + 1).padStart(2, "0")}-${String(latestMatchingRecord.date.getUTCDate()).padStart(2, "0")}`
-    : getTodayLocalDateString());
+    : todayInIndia);
 
   // Split selectedDate for boundary ranges (capture any midday UTC imports accurately)
   const [year, month, day] = selectedDate.split("-").map(Number);
@@ -160,7 +165,8 @@ export async function getMandiPrices(params: MandiQueryParams) {
     totalPages,
     isDbEmpty,
     dataDate: selectedDate,
-    usedLatestAvailable: !requestedDate && Boolean(latestMatchingRecord),
+    usedLatestAvailable:
+      !requestedDate && Boolean(latestMatchingRecord) && selectedDate < todayInIndia,
   };
 }
 

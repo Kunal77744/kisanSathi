@@ -6,7 +6,7 @@ import { unstable_cache } from "next/cache";
 import MandiFilters from "@/components/mandi-bhav/MandiFilters";
 import MandiTable from "@/components/mandi-bhav/MandiTable";
 import { slugify } from "@/lib/utils";
-import { getMandiPrices } from "@/lib/mandiQueries";
+import { getMandiPrices, getTodayInIndiaDateString } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
 
 
@@ -64,14 +64,6 @@ interface PageProps {
   };
 }
 
-const getTodayLocalDateString = () => {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-};
-
 const formatHindiDate = (dateStr: string) => {
   const parts = dateStr.split("-").map(Number);
   if (parts.length !== 3 || isNaN(parts[0])) return dateStr;
@@ -105,7 +97,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
     page: currentPage,
     pageSize,
   });
-  const selectedDate = requestedDate || dataDate || getTodayLocalDateString();
+  const selectedDate = requestedDate || dataDate || getTodayInIndiaDateString();
 
   // 1. Fetch unique lists from DB for the filters concurrently via getCachedFilters cache
   const { distinctStates, distinctDistricts, distinctMandis, distinctCrops } = await getCachedFilters();
