@@ -49,7 +49,13 @@ export async function generateMetadata({ params }: RouteParams) {
   );
 
   if (!matchedCrop) {
-    notFound();
+    return {
+      title: "फसल नहीं मिली | KisanSathi",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
   return buildCropPageMetadata(matchedCrop);
