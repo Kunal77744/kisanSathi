@@ -11,6 +11,10 @@ interface ContentTurn {
   parts: ContentPart[];
 }
 
+const GEMINI_MODEL = "gemini-2.5-flash";
+const SAFE_SERVICE_ERROR =
+  "क्षमा करें, किसान साथी अभी उत्तर नहीं दे पा रहा है। कृपया थोड़ी देर बाद फिर प्रयास करें। (Kisan Sathi can't answer right now. Please try again shortly.)";
+
 export async function POST(req: NextRequest) {
   try {
     const { message, history } = await req.json();
@@ -24,8 +28,8 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.AI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: "AI_API_KEY is not configured on the server." },
-        { status: 500 }
+        { success: false, error: SAFE_SERVICE_ERROR },
+        { status: 503 }
       );
     }
 
@@ -57,7 +61,7 @@ Guidelines:
       parts: [{ text: message }],
     });
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
     const response = await fetch(geminiUrl, {
       method: "POST",
       headers: {
@@ -72,9 +76,12 @@ Guidelines:
     });
 
     if (!response.ok) {
-      const errText = await response.text();
+      console.error("Kisan Sathi AI provider request failed", {
+        model: GEMINI_MODEL,
+        status: response.status,
+      });
       return NextResponse.json(
-        { success: false, error: `Gemini API returned error: ${errText}` },
+        { success: false, error: SAFE_SERVICE_ERROR },
         { status: 502 }
       );
     }
@@ -84,7 +91,7 @@ Guidelines:
 
     if (!generatedText) {
       return NextResponse.json(
-        { success: false, error: "Gemini API failed to return text content." },
+        { success: false, error: SAFE_SERVICE_ERROR },
         { status: 502 }
       );
     }
@@ -94,10 +101,11 @@ Guidelines:
       response: generatedText,
     });
   } catch (error) {
-    console.error("Error in Kisan Sathi AI API:", error);
-    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Kisan Sathi AI request failed", {
+      errorType: error instanceof Error ? error.name : "UnknownError",
+    });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: SAFE_SERVICE_ERROR },
       { status: 500 }
     );
   }
