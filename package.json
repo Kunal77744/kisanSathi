@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma db push && next build",
+    "build": "npm run db:push && next build",
+    "db:push": "node scripts/prisma-push-with-retry.mjs",
     "start": "next start",
     "lint": "next lint",
     "check:mandi-archive": "tsx scripts/check-mandi-archive.ts",
