@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   verification: {
-    google: "Hb788eyiK_Eyyv7szMXNVZwxdYqtmtDGM0FG6Fw-NjM",
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "Hb788eyiK_Eyyv7szMXNVZwxdYqtmtDGM0FG6Fw-NjM",
   },
   alternates: {
     canonical: "/",
@@ -104,6 +104,18 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {/* Google tag (gtag.js) */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || "G-ZHWK8VSJC8"}`}></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || "G-ZHWK8VSJC8"}');
+            `,
+          }}
         />
       </head>
       <body
