@@ -8,6 +8,7 @@ import MandiTable from "@/components/mandi-bhav/MandiTable";
 import { slugify } from "@/lib/utils";
 import { getMandiPrices } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
+import MandiSearchResultAnalytics from "@/components/mandi-bhav/MandiSearchResultAnalytics";
 import { normalizeMandiSearchQuery, resolveMandiSearch } from "@/lib/mandiSearch";
 
 
@@ -64,6 +65,7 @@ interface PageProps {
     date?: string;
     q?: string;
     search?: string;
+    source?: string;
   };
 }
 
@@ -111,6 +113,9 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
   const selectedView = searchParams.view === "table" ? "table" : "card";
   const selectedDate = searchParams.date || getTodayLocalDateString();
   const searchHasNoMatch = Boolean(normalizedQuery && !hasExplicitFilters && !searchMatch);
+  const shouldCaptureHomepageSearch = Boolean(
+    normalizedQuery && !hasExplicitFilters && searchParams.source === "homepage"
+  );
   
   // Parse page number and set page size limit
   const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10));
@@ -194,6 +199,12 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex-grow bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 py-10">
+      {shouldCaptureHomepageSearch && (
+        <MandiSearchResultAnalytics
+          outcome={searchMatch ? "match" : "no_match"}
+          matchType={searchMatch?.field || "none"}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
