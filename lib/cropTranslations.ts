@@ -103,6 +103,8 @@ export const districtTranslations: Record<string, string> = {
 
 export const mandiTranslations: Record<string, string> = {
   // Madhya Pradesh APMC Mandis
+  azadpur: "आजादपुर मंडी",
+  "azadpur apmc": "आजादपुर मंडी",
   indore: "इंदौर मंडी",
   bhopal: "भोपाल मंडी",
   ujjain: "उज्जैन मंडी",
@@ -187,4 +189,3 @@ export function translateState(state: string, lang: "en" | "hi"): string {
   const key = normalize(state);
   return stateTranslations[key] || state;
 }
-

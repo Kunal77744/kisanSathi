@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Wheat, BadgeAlert, RotateCcw, PlusCircle, Globe } from "lucide-react";
+import { Wheat, BadgeAlert, RotateCcw, PlusCircle, Globe, Search } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import MandiFilters from "@/components/mandi-bhav/MandiFilters";
@@ -8,6 +8,7 @@ import MandiTable from "@/components/mandi-bhav/MandiTable";
 import { slugify } from "@/lib/utils";
 import { getMandiPrices } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
+import { normalizeMandiSearchQuery, resolveMandiSearch } from "@/lib/mandiSearch";
 
 
 
@@ -61,6 +62,8 @@ interface PageProps {
     page?: string;
     view?: string;
     date?: string;
+    q?: string;
+    search?: string;
   };
 }
 
@@ -84,12 +87,30 @@ const formatHindiDate = (dateStr: string) => {
 };
 
 export default async function MandiBhavPage({ searchParams }: PageProps) {
-  const selectedState = searchParams.state || "";
-  const selectedDistrict = searchParams.district || "";
-  const selectedMandi = searchParams.mandi || "";
-  const selectedCrop = searchParams.crop || "";
+  const normalizedQuery = normalizeMandiSearchQuery(searchParams.q || searchParams.search);
+  const hasExplicitFilters = Boolean(
+    searchParams.state || searchParams.district || searchParams.mandi || searchParams.crop
+  );
+
+  // Fetch the existing filter values first so homepage search reuses the same source of truth.
+  const { distinctStates, distinctDistricts, distinctMandis, distinctCrops } = await getCachedFilters();
+
+  const searchMatch = !hasExplicitFilters
+    ? resolveMandiSearch(normalizedQuery, {
+        states: distinctStates.map((item) => item.state).filter(Boolean),
+        districts: distinctDistricts.map((item) => item.district).filter(Boolean),
+        mandis: distinctMandis.map((item) => item.mandi).filter(Boolean),
+        crops: distinctCrops.map((item) => item.crop).filter(Boolean),
+      })
+    : null;
+
+  const selectedState = searchParams.state || (searchMatch?.field === "state" ? searchMatch.value : "");
+  const selectedDistrict = searchParams.district || (searchMatch?.field === "district" ? searchMatch.value : "");
+  const selectedMandi = searchParams.mandi || (searchMatch?.field === "mandi" ? searchMatch.value : "");
+  const selectedCrop = searchParams.crop || (searchMatch?.field === "crop" ? searchMatch.value : "");
   const selectedView = searchParams.view === "table" ? "table" : "card";
   const selectedDate = searchParams.date || getTodayLocalDateString();
+  const searchHasNoMatch = Boolean(normalizedQuery && !hasExplicitFilters && !searchMatch);
   
   // Parse page number and set page size limit
   const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10));
@@ -105,9 +126,6 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
     page: currentPage,
     pageSize,
   });
-
-  // 1. Fetch unique lists from DB for the filters concurrently via getCachedFilters cache
-  const { distinctStates, distinctDistricts, distinctMandis, distinctCrops } = await getCachedFilters();
 
   // Extract lists and filter empty values
   const statesRawList = distinctStates.map((s) => s.state).filter(Boolean);
@@ -129,6 +147,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
     if (selectedMandi) params.set("mandi", selectedMandi);
     if (selectedCrop) params.set("crop", selectedCrop);
     if (selectedDate) params.set("date", selectedDate);
+    if (normalizedQuery) params.set("q", normalizedQuery);
     if (selectedView !== "card") params.set("view", selectedView);
     params.set("page", String(pageNumber));
     return `/mandi-bhav?${params.toString()}`;
@@ -142,6 +161,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
     if (selectedMandi) params.set("mandi", selectedMandi);
     if (selectedCrop) params.set("crop", selectedCrop);
     if (selectedDate) params.set("date", selectedDate);
+    if (normalizedQuery) params.set("q", normalizedQuery);
     if (searchParams.page) params.set("page", searchParams.page);
     if (viewName !== "card") params.set("view", viewName);
     return `/mandi-bhav?${params.toString()}`;
@@ -218,7 +238,7 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
         )}
 
         {/* Date Title Banner */}
-        {!isDbEmpty && (
+        {!isDbEmpty && !searchHasNoMatch && (
           <div className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-2xl px-6 py-4 shadow-3xs flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-extrabold text-stone-800 dark:text-white">
               📅 {displayHindiDate} के भाव
@@ -230,11 +250,13 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
         )}
 
         {/* Results Info Bar & View Toggle */}
-        {!isDbEmpty && totalMatchingCount > 0 && (
+        {!isDbEmpty && !searchHasNoMatch && totalMatchingCount > 0 && (
           <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-2xl px-6 py-4 shadow-sm text-stone-750 dark:text-stone-300 gap-4">
             <div className="flex flex-col gap-0.5">
               <span className="font-bold text-base md:text-lg text-kisan-green-800 dark:text-kisan-green-400">
-                {noFiltersActive 
+                {normalizedQuery
+                  ? `“${normalizedQuery}” के लिए ${totalMatchingCount.toLocaleString()} परिणाम`
+                  : noFiltersActive
                   ? "मुख्य मंडियों के भाव (Top Featured Mandis)" 
                   : `${totalMatchingCount.toLocaleString()} परिणाम मिले (Results Found)`}
               </span>
@@ -299,6 +321,26 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             </div>
             <Link href="/admin/mandi-entry" className="btn-primary inline-flex w-full sm:w-auto min-h-[48px]">
               पहला डेटा जोड़ें / Go to Entry
+            </Link>
+          </div>
+        ) : searchHasNoMatch ? (
+          <div className="mx-auto max-w-lg space-y-4 rounded-3xl border border-kisan-cream-200 bg-white p-8 py-16 text-center shadow-sm dark:border-kisan-green-900/20 dark:bg-stone-900">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-500 dark:bg-stone-800">
+              <Search className="h-6 w-6" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-stone-850 dark:text-white">
+                “{normalizedQuery}” के लिए कोई फसल या मंडी नहीं मिली
+              </h2>
+              <p className="text-sm text-stone-500 dark:text-stone-400">
+                फसल, मंडी, जिला या राज्य का सही नाम लिखें, या ऊपर दिए गए फ़िल्टर से चुनें।
+              </p>
+            </div>
+            <Link
+              href="/mandi-bhav"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-kisan-green-700 px-5 py-2.5 font-bold text-kisan-green-700 transition-colors hover:bg-kisan-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kisan-green-600 focus-visible:ring-offset-2 dark:text-kisan-green-400 dark:hover:bg-kisan-green-950/30"
+            >
+              सभी फ़िल्टर देखें
             </Link>
           </div>
         ) : priceRecords.length === 0 ? (

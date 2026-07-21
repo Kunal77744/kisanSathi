@@ -7,7 +7,6 @@ import {
   MessageSquareText,
   CalendarDays,
   Newspaper,
-  Search,
   ArrowRight,
   ShieldCheck,
   RefreshCw,
@@ -15,6 +14,7 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
+import HomeMandiSearch from "@/components/home/HomeMandiSearch";
 
 export const metadata = {
   title: "किसान साथी - आपकी खेती का विश्वसनीय साथी | KisanSathi",
@@ -104,24 +104,7 @@ export default function Home() {
 
           {/* Centered Search Bar */}
           <div className="max-w-2xl mx-auto w-full pt-2">
-            <form action="/mandi-bhav" method="GET" className="relative flex items-center w-full bg-white dark:bg-stone-900 border-2 border-kisan-cream-300 dark:border-kisan-green-900/40 focus-within:border-kisan-green-600 dark:focus-within:border-kisan-green-500 rounded-2xl shadow-md p-1.5 transition-all duration-300">
-              <div className="pl-3 text-stone-400">
-                <Search className="h-6 w-6" />
-              </div>
-              <input
-                type="text"
-                name="search"
-                placeholder="अपनी फसल या मंडी खोजें... (उदा. गेहूँ, धान, आजादपुर)"
-                className="w-full pl-3 pr-4 py-3 bg-transparent text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none text-base md:text-lg min-h-[48px]"
-                aria-label="Search crop or mandi"
-              />
-              <button
-                type="submit"
-                className="bg-kisan-green-700 hover:bg-kisan-green-800 text-white font-bold px-6 md:px-8 py-3 rounded-xl transition-all duration-200 cursor-pointer active:scale-95 text-base md:text-lg shrink-0 min-h-[48px]"
-              >
-                खोजें
-              </button>
-            </form>
+            <HomeMandiSearch />
           </div>
         </div>
       </section>
