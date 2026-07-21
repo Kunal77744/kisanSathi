@@ -10,21 +10,38 @@ generator client {
 }
 
 model MandiPrice {
-  id         Int      @id @default(autoincrement())
-  state      String   @default("Madhya Pradesh")
+  id         Int       @id @default(autoincrement())
+  state      String    @default("Madhya Pradesh")
   district   String
   mandi      String
   crop       String
-  date       DateTime @default(now())
+  variety    String    @default("")
+  grade      String    @default("")
+  date       DateTime  @default(now())
   minPrice   Float
   maxPrice   Float
   modalPrice Float
-  source     String   @default("manual_verified")
-  createdAt  DateTime @default(now())
+  source     String    @default("manual_verified")
+  logicalKey String?   @unique
+  ingestedAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
 
   @@index([state])
   @@index([district])
   @@index([mandi])
   @@index([crop])
   @@index([date])
+  @@index([date, crop])
+  @@index([date, state, district])
+}
+
+model MandiSyncCheckpoint {
+  id         String   @id
+  startDate  DateTime
+  endDate    DateTime
+  nextDate   DateTime
+  nextOffset Int      @default(0)
+  status     String   @default("running")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

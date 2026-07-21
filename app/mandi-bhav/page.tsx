@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Wheat, BadgeAlert, RotateCcw, PlusCircle, Globe } from "lucide-react";
+import { Wheat, BadgeAlert, RotateCcw, PlusCircle, Globe, Archive } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import MandiFilters from "@/components/mandi-bhav/MandiFilters";
@@ -201,6 +201,14 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             <span>डेटा दर्ज करें (Admin Portal)</span>
           </Link>
         </div>
+
+        <Link
+          href="/mandi-bhav/archive"
+          className="inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-kisan-green-700 underline decoration-kisan-green-300 underline-offset-4 hover:text-kisan-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kisan-green-500 dark:text-kisan-green-400"
+        >
+          <Archive className="h-4 w-4" />
+          तारीख के अनुसार पुराने मंडी भाव देखें
+        </Link>
 
         {/* Render filters if database contains any items */}
         {!isDbEmpty && (
