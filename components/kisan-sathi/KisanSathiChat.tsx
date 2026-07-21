@@ -24,6 +24,7 @@ export default function KisanSathiChat() {
   const [error, setError] = useState("");
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const hasTrackedFirstMessageRef = useRef(false);
 
   // Auto-scroll to the bottom when messages update
   useEffect(() => {
@@ -41,6 +42,14 @@ export default function KisanSathiChat() {
     setLoading(true);
 
     // Track the interaction state only. The farmer's question is never sent to analytics.
+    if (!hasTrackedFirstMessageRef.current) {
+      hasTrackedFirstMessageRef.current = true;
+      posthog.capture("assistant_first_message_submitted", {
+        turn_number: 1,
+        $current_url: window.location.pathname,
+      });
+    }
+
     posthog.capture("assistant_question_submitted", {
       turn_number: turnNumber,
     });
@@ -94,6 +103,7 @@ export default function KisanSathiChat() {
   };
 
   const handleReset = () => {
+    hasTrackedFirstMessageRef.current = false;
     setMessages([
       {
         role: "assistant",
