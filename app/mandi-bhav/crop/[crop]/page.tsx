@@ -74,25 +74,24 @@ export default async function CropMandiPage({ params }: RouteParams) {
 
   const cropHindi = translateCrop(matchedCrop, "hi");
 
-  // Fetch today's records for this crop, sorted by modalPrice desc (highest price first)
-  // We look at the most recent 100 entries in the DB to keep pages performant
+  // Keep the newest source date first. Within each date, show the highest
+  // modal price first so the page remains useful without mixing older records
+  // ahead of fresher ones.
   const priceRecords = await prisma.mandiPrice.findMany({
     where: {
       crop: matchedCrop,
     },
     orderBy: [
       { date: "desc" },
-      { modalPrice: "desc" }
+      { modalPrice: "desc" },
+      { id: "asc" },
     ],
     take: 100,
   });
 
-  // Sort by modalPrice desc in memory to ensure highest rates are absolutely pinned to the top
-  const sortedRecords = [...priceRecords].sort((a, b) => b.modalPrice - a.modalPrice);
-
   // Compute trends for the records shown
   const priceRecordsWithTrends = await Promise.all(
-    sortedRecords.map(async (record) => {
+    priceRecords.map(async (record) => {
       const trend = await getPriceTrend(
         record.state,
         record.district,
@@ -105,8 +104,8 @@ export default async function CropMandiPage({ params }: RouteParams) {
     })
   );
 
-  const displayDate = sortedRecords[0]?.date
-    ? new Date(sortedRecords[0].date).toISOString().split("T")[0]
+  const displayDate = priceRecords[0]?.date
+    ? new Date(priceRecords[0].date).toISOString().split("T")[0]
     : new Date().toISOString().split("T")[0];
 
   // Helper to format Hindi display dates
@@ -176,7 +175,7 @@ export default async function CropMandiPage({ params }: RouteParams) {
         </div>
 
         {/* Main Price Grid */}
-        {sortedRecords.length === 0 ? (
+        {priceRecords.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/10 rounded-3xl space-y-4">
             <span className="text-5xl">🌾</span>
             <h2 className="text-xl font-bold text-stone-900 dark:text-white">डेटा अनुपलब्ध</h2>
