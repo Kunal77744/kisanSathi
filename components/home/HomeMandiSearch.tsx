@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { normalizeMandiSearchQuery } from "@/lib/mandiSearch";
 
 export default function HomeMandiSearch() {
   const router = useRouter();
+  const posthog = usePostHog();
   const [query, setQuery] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -15,7 +17,15 @@ export default function HomeMandiSearch() {
     const normalizedQuery = normalizeMandiSearchQuery(query);
     if (!normalizedQuery) return;
 
-    router.push(`/mandi-bhav?q=${encodeURIComponent(normalizedQuery)}`);
+    posthog.capture("mandi_search_submitted", {
+      source: "homepage",
+      destination: "/mandi-bhav",
+      $current_url: `${window.location.origin}${window.location.pathname}`,
+    });
+
+    router.push(
+      `/mandi-bhav?q=${encodeURIComponent(normalizedQuery)}&source=homepage`
+    );
   };
 
   return (

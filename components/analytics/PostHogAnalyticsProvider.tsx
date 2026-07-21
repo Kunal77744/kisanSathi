@@ -16,6 +16,8 @@ if (typeof window !== "undefined") {
     capture_pageview: false,
     capture_pageleave: false,
     disable_session_recording: true,
+    mask_personal_data_properties: true,
+    custom_personal_data_properties: ["q", "search"],
     person_profiles: "identified_only",
   });
 }
