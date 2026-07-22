@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Sprout,
   Wheat,
@@ -37,6 +38,7 @@ export default function Home() {
       bgGradient: "from-emerald-50 to-green-100/60 dark:from-emerald-950/40 dark:to-emerald-900/20",
       borderColor: "border-emerald-200 dark:border-emerald-800/40",
       badge: "लाइव रेट्स",
+      imgSrc: "/images/mandi_market.jpg",
     },
     {
       icon: <CloudSun className="h-8 w-8 text-sky-700 dark:text-sky-400" />,
@@ -47,6 +49,7 @@ export default function Home() {
       bgGradient: "from-sky-50 to-blue-100/60 dark:from-sky-950/40 dark:to-sky-900/20",
       borderColor: "border-sky-200 dark:border-sky-800/40",
       badge: "उपग्रह अलर्ट",
+      imgSrc: "/images/weather_station.jpg",
     },
     {
       icon: <MessageSquareText className="h-8 w-8 text-purple-700 dark:text-purple-400" />,
@@ -57,6 +60,7 @@ export default function Home() {
       bgGradient: "from-purple-50 to-indigo-100/60 dark:from-purple-950/40 dark:to-purple-900/20",
       borderColor: "border-purple-200 dark:border-purple-800/40",
       badge: "24x7 असिस्टेंट",
+      imgSrc: "/images/ai_assistant.jpg",
     },
     {
       icon: <CalendarDays className="h-8 w-8 text-amber-700 dark:text-amber-400" />,
@@ -67,6 +71,7 @@ export default function Home() {
       bgGradient: "from-amber-50 to-yellow-100/60 dark:from-amber-950/40 dark:to-amber-900/20",
       borderColor: "border-amber-200 dark:border-amber-800/40",
       badge: "सरकारी पोर्टल",
+      imgSrc: null,
     },
     {
       icon: <Newspaper className="h-8 w-8 text-teal-700 dark:text-teal-400" />,
@@ -77,6 +82,7 @@ export default function Home() {
       bgGradient: "from-teal-50 to-cyan-100/60 dark:from-teal-950/40 dark:to-teal-900/20",
       borderColor: "border-teal-200 dark:border-teal-800/40",
       badge: "दैनिक अपडेट",
+      imgSrc: null,
     },
   ];
 
@@ -90,63 +96,85 @@ export default function Home() {
   return (
     <div className="flex-grow flex flex-col bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       
-      {/* 1. HERO SECTION WITH RICH GRADIENTS & STATS */}
+      {/* 1. HERO SECTION WITH RICH GRAPHICS & FARMER IMAGE */}
       <section className="relative w-full py-12 md:py-20 overflow-hidden border-b border-kisan-cream-200 dark:border-kisan-green-900/20 bg-gradient-to-b from-emerald-900/10 via-white to-kisan-cream-100 dark:from-emerald-950/40 dark:via-stone-950 dark:to-stone-950">
         
-        {/* Soft background glow spheres */}
         <div className="absolute top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute top-20 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-center">
-          
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 shadow-sm text-emerald-800 dark:text-emerald-300 font-extrabold text-sm tracking-wide">
-            <Sparkles className="h-4 w-4 text-emerald-600 animate-pulse" />
-            <span>भारत का 100% मुफ़्त डिजिटल कृषि पोर्टल (Govt API Verified)</span>
-          </div>
-
-          {/* Headline */}
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-tight">
-              किसान साथी — <br className="sm:hidden" />
-              <span className="bg-gradient-to-r from-emerald-700 via-green-600 to-amber-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-green-300 dark:to-amber-400">
-                आपकी हर फसल का सच्चा साथी
-              </span>
-            </h1>
-            <p className="max-w-3xl mx-auto text-lg sm:text-xl text-stone-600 dark:text-stone-300 font-medium leading-relaxed">
-              36 राज्यों की मंडियों के आज के ताज़ा भाव, 7-दिवसीय ग्राफ, मौसम चेतावनी और सरकारी योजनाओं की पूरी जानकारी एक ही जगह।
-            </p>
-          </div>
-
-          {/* Central Search Form */}
-          <div className="max-w-2xl mx-auto w-full pt-2">
-            <form
-              action="/mandi-bhav"
-              method="GET"
-              className="relative flex items-center w-full bg-white dark:bg-stone-900 border-2 border-emerald-500/40 dark:border-emerald-600/50 focus-within:border-emerald-600 rounded-2xl shadow-xl p-2 transition-all"
-            >
-              <div className="pl-3 text-stone-400">
-                <Search className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 shadow-sm text-emerald-800 dark:text-emerald-300 font-extrabold text-xs sm:text-sm tracking-wide">
+                <Sparkles className="h-4 w-4 text-emerald-600 animate-pulse" />
+                <span>भारत का 100% मुफ़्त डिजिटल कृषि पोर्टल (Govt API Verified)</span>
               </div>
-              <input
-                type="text"
-                name="crop"
-                placeholder="अपनी फसल या मंडी खोजें... (उदा. गेहूं, सोयाबीन, लहसुन, इंदौर)"
-                className="w-full pl-3 pr-4 py-3 bg-transparent text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none text-base md:text-lg min-h-[48px] font-medium"
-                aria-label="Search crop or mandi"
-              />
-              <button
-                type="submit"
-                className="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold px-6 md:px-8 py-3 rounded-xl transition-all duration-200 cursor-pointer active:scale-95 text-base md:text-lg shrink-0 min-h-[48px] shadow-md flex items-center gap-2"
+
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-tight">
+                किसान साथी — <br />
+                <span className="bg-gradient-to-r from-emerald-700 via-green-600 to-amber-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-green-300 dark:to-amber-400">
+                  आपकी हर फसल का सच्चा साथी
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                36 राज्यों की मंडियों के आज के ताज़ा भाव, 7-दिवसीय ग्राफ, मौसम चेतावनी और सरकारी योजनाओं की पूरी जानकारी एक ही जगह।
+              </p>
+
+              {/* Central Search Form */}
+              <form
+                action="/mandi-bhav"
+                method="GET"
+                className="relative flex items-center w-full max-w-xl mx-auto lg:mx-0 bg-white dark:bg-stone-900 border-2 border-emerald-500/40 dark:border-emerald-600/50 focus-within:border-emerald-600 rounded-2xl shadow-xl p-2 transition-all"
               >
-                <span>खोजें</span>
-                <ArrowRight className="h-5 w-5 hidden sm:inline" />
-              </button>
-            </form>
+                <div className="pl-3 text-stone-400">
+                  <Search className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
+                </div>
+                <input
+                  type="text"
+                  name="crop"
+                  placeholder="अपनी फसल या मंडी खोजें... (उदा. गेहूं, सोयाबीन, लहसुन)"
+                  className="w-full pl-3 pr-4 py-3 bg-transparent text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none text-base md:text-lg min-h-[48px] font-medium"
+                  aria-label="Search crop or mandi"
+                />
+                <button
+                  type="submit"
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold px-6 md:px-8 py-3 rounded-xl transition-all duration-200 cursor-pointer active:scale-95 text-base md:text-lg shrink-0 min-h-[48px] shadow-md flex items-center gap-2"
+                >
+                  <span>खोजें</span>
+                  <ArrowRight className="h-5 w-5 hidden sm:inline" />
+                </button>
+              </form>
+            </div>
+
+            {/* Right Visual Image Column */}
+            <div className="lg:col-span-5 relative flex justify-center">
+              <div className="relative w-full max-w-md aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 group">
+                <Image
+                  src="/images/farmer_hero.jpg"
+                  alt="KisanSathi Farmer"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white space-y-1">
+                  <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black uppercase">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>सत्यापित कृषि पोर्टल</span>
+                  </div>
+                  <h3 className="font-extrabold text-xl text-white">सशक्त किसान, समृद्ध भारत</h3>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Live Quick Stats Bar */}
-          <div className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {stats.map((st) => (
               <div
                 key={st.label}
@@ -211,6 +239,18 @@ export default function Home() {
                 <p className="text-stone-600 dark:text-stone-300 text-sm leading-relaxed font-medium">
                   {m.descHi}
                 </p>
+
+                {m.imgSrc && (
+                  <div className="relative w-full h-28 rounded-xl overflow-hidden mt-2 border border-stone-200/40 shadow-2xs">
+                    <Image
+                      src={m.imgSrc}
+                      alt={m.titleHi}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 300px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="pt-6 flex items-center text-emerald-700 dark:text-emerald-400 font-extrabold text-sm gap-1 group-hover:gap-2 transition-all">
