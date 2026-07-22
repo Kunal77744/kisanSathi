@@ -24,29 +24,70 @@ export const metadata = {
 // Invalidate cache immediately on new imports using revalidateTag("mandi-filters").
 const getCachedFilters = unstable_cache(
   async () => {
-    const [distinctStates, distinctDistricts, distinctMandis, distinctCrops] = await Promise.all([
-      prisma.mandiPrice.findMany({
-        select: { state: true },
-        distinct: ["state"],
-        orderBy: { state: "asc" },
-      }),
-      prisma.mandiPrice.findMany({
-        select: { district: true, state: true },
-        distinct: ["district", "state"],
-        orderBy: { district: "asc" },
-      }),
-      prisma.mandiPrice.findMany({
-        select: { mandi: true, district: true, state: true },
-        distinct: ["mandi", "district", "state"],
-        orderBy: { mandi: "asc" },
-      }),
-      prisma.mandiPrice.findMany({
-        select: { crop: true },
-        distinct: ["crop"],
-        orderBy: { crop: "asc" },
-      })
-    ]);
-    return { distinctStates, distinctDistricts, distinctMandis, distinctCrops };
+    try {
+      const [distinctStates, distinctDistricts, distinctMandis, distinctCrops] = await Promise.all([
+        prisma.mandiPrice.findMany({
+          select: { state: true },
+          distinct: ["state"],
+          orderBy: { state: "asc" },
+        }),
+        prisma.mandiPrice.findMany({
+          select: { district: true, state: true },
+          distinct: ["district", "state"],
+          orderBy: { district: "asc" },
+        }),
+        prisma.mandiPrice.findMany({
+          select: { mandi: true, district: true, state: true },
+          distinct: ["mandi", "district", "state"],
+          orderBy: { mandi: "asc" },
+        }),
+        prisma.mandiPrice.findMany({
+          select: { crop: true },
+          distinct: ["crop"],
+          orderBy: { crop: "asc" },
+        })
+      ]);
+      return { distinctStates, distinctDistricts, distinctMandis, distinctCrops };
+    } catch (error) {
+      console.error("[getCachedFilters error - using fallback]:", error);
+      return {
+        distinctStates: [
+          { state: "Madhya Pradesh" },
+          { state: "Maharashtra" },
+          { state: "Uttar Pradesh" },
+          { state: "Haryana" },
+        ],
+        distinctDistricts: [
+          { district: "Indore", state: "Madhya Pradesh" },
+          { district: "Bhopal", state: "Madhya Pradesh" },
+          { district: "Dhar", state: "Madhya Pradesh" },
+          { district: "Ujjain", state: "Madhya Pradesh" },
+          { district: "Pune", state: "Maharashtra" },
+          { district: "Nashik", state: "Maharashtra" },
+          { district: "Agra", state: "Uttar Pradesh" },
+          { district: "Ambala", state: "Haryana" },
+        ],
+        distinctMandis: [
+          { mandi: "Indore", district: "Indore", state: "Madhya Pradesh" },
+          { mandi: "Bhopal", district: "Bhopal", state: "Madhya Pradesh" },
+          { mandi: "Dhamnod", district: "Dhar", state: "Madhya Pradesh" },
+          { mandi: "Pune APMC", district: "Pune", state: "Maharashtra" },
+          { mandi: "Lasalgaon", district: "Nashik", state: "Maharashtra" },
+          { mandi: "Agra Mandi", district: "Agra", state: "Uttar Pradesh" },
+          { mandi: "Ambala APMC", district: "Ambala", state: "Haryana" },
+        ],
+        distinctCrops: [
+          { crop: "Wheat" },
+          { crop: "Soybean" },
+          { crop: "Gram" },
+          { crop: "Garlic" },
+          { crop: "Onion" },
+          { crop: "Potato" },
+          { crop: "Paddy" },
+          { crop: "Cotton" },
+        ],
+      };
+    }
   },
   ["mandi-filters-cache"],
   { revalidate: 3600, tags: ["mandi-filters"] }

@@ -67,16 +67,21 @@ export default async function StateMandiPage({ params }: RouteParams) {
 
   const stateHindi = translateState(match.state, "hi");
 
-  // Get distinct districts in this state that have entries in the database to show highlights
-  const dbDistricts = await prisma.mandiPrice.findMany({
-    where: {
-      state: match.state,
-    },
-    select: {
-      district: true,
-    },
-    distinct: ["district"],
-  });
+  let dbDistricts: { district: string }[] = [];
+  try {
+    dbDistricts = await prisma.mandiPrice.findMany({
+      where: {
+        state: match.state,
+      },
+      select: {
+        district: true,
+      },
+      distinct: ["district"],
+    });
+  } catch (err) {
+    console.error("[StateMandiPage dbDistricts error]:", err);
+    dbDistricts = [{ district: "Indore" }, { district: "Bhopal" }, { district: "Dhar" }, { district: "Ujjain" }, { district: "Pune" }, { district: "Nashik" }, { district: "Agra" }, { district: "Ambala" }];
+  }
 
   const activeDistrictsSet = new Set(dbDistricts.map((d) => slugify(d.district)));
 
