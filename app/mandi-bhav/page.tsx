@@ -18,8 +18,11 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "मंडी भाव - वास्तविक समय फसल दरें",
-  description: "मध्यप्रदेश और देश की अन्य मंडियों के वास्तविक समय के फसल भाव और बाजार दरें देखें।",
+  title: "आज का मंडी भाव (Mandi Bhav Today) - 36 राज्य & 1000+ मंडियां | किसान साथी",
+  description: "भारत की सभी 1,000+ मंडियों के आज के ताज़ा फसल भाव, गेहूं, सोयाबीन, लहसुन, चना, प्याज की दरें और 7-दिवसीय लाइव ट्रेंड ग्राफ देखें।",
+  alternates: {
+    canonical: "https://ekisansaathi.vercel.app/mandi-bhav",
+  },
 };
 
 // Cache the filters dropdown lists to avoid running 4 expensive distinct DB queries on every request.
@@ -225,6 +228,29 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex-grow bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "मुख्य पृष्ठ",
+                "item": "https://ekisansaathi.vercel.app",
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "मंडी भाव",
+                "item": "https://ekisansaathi.vercel.app/mandi-bhav",
+              },
+            ],
+          }),
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

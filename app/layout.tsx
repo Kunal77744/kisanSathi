@@ -56,27 +56,32 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "Hb788eyiK_Eyyv7szMXNVZwxdYqtmtDGM0FG6Fw-NjM",
   },
   alternates: {
-    canonical: "/",
+    canonical: SITE_URL,
   },
   openGraph: {
-    title: "KisanSathi - Digital Companion for Indian Farmers",
-    description: "Empowering Indian farmers with real-time mandi bhav, government schemes, and crop advisory.",
+    title: "आज का मंडी भाव (Mandi Bhav Today), मौसम & PM Kisan | किसान साथी",
+    description: "36 राज्यों के 1,000+ मंडी भाव, लाइव मौसम पूर्वानुमान और सरकारी योजनाएं एक ही जगह।",
     url: SITE_URL,
     siteName: "KisanSathi",
     images: [
       {
-        url: "/og-image.jpg",
+        url: `${SITE_URL}/images/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "KisanSathi - Digital Companion for Indian Farmers",
+        alt: "KisanSathi - आज का मंडी भाव व डिजिटल कृषि सेवा",
       },
     ],
     locale: "hi_IN",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "आज का मंडी भाव (Mandi Bhav Today) | किसान साथी",
+    description: "36 राज्यों के 1,000+ मंडी भाव, 7-दिवसीय मौसम पूर्वानुमान और सरकारी योजनाएं।",
+    images: [`${SITE_URL}/images/og-image.png`],
+  },
 };
 
-// Viewport configuration for maximum mobile responsiveness
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -88,12 +93,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = {
+  const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "KisanSathi",
     "url": SITE_URL,
-    "logo": `${SITE_URL}/og-image.jpg`,
+    "logo": `${SITE_URL}/images/og-image.png`,
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+91-1800-180-1551",
@@ -102,12 +107,47 @@ export default function RootLayout({
     },
   };
 
+  const appJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "किसान साथी (KisanSathi)",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "url": SITE_URL,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR",
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "मुख्य पृष्ठ (Home)",
+        "item": SITE_URL,
+      },
+    ],
+  };
+
   return (
     <html lang="hi" className="scroll-smooth">
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
         {/* Google tag (gtag.js) */}
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || "G-ZHWK8VSJC8"}`}></script>
