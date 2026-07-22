@@ -18,22 +18,73 @@ export const metadata = {
 };
 
 export default function SchemesListingPage() {
-  const renderIllustration = (name: string) => {
-    switch (name) {
-      case "Coins":
-        return <PMKisanIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "Shield":
-        return <PMFBYIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "CreditCard":
-        return <KCCIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "Leaf":
-        return <SoilHealthIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "Sun":
-        return <PMKUSUMIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "ShoppingBag":
-        return <ENAMIllustration className="w-full h-40 object-contain rounded-xl" />;
+  const renderIllustration = (name: string, slug: string) => {
+    switch (slug) {
+      case "pm-kisan":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/pm_kisan_card.png"
+              alt="PM Kisan Subsidy"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "pmfby":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/pmfby_card.png"
+              alt="Fasal Bima Insurance"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "kcc":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/kcc_card.png"
+              alt="Kisan Credit Card"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "soil-health-card":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/soil_health_card.png"
+              alt="Soil Health Card"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
       default:
-        return <PMKisanIllustration className="w-full h-40 object-contain rounded-xl" />;
+        switch (name) {
+          case "Coins":
+            return <PMKisanIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "Shield":
+            return <PMFBYIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "CreditCard":
+            return <KCCIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "Leaf":
+            return <SoilHealthIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "Sun":
+            return <PMKUSUMIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "ShoppingBag":
+            return <ENAMIllustration className="w-full h-40 object-contain rounded-xl" />;
+          default:
+            return <PMKisanIllustration className="w-full h-40 object-contain rounded-xl" />;
+        }
     }
   };
 
@@ -95,11 +146,11 @@ export default function SchemesListingPage() {
           {schemesData.map((scheme) => (
             <div
               key={scheme.slug}
-              className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group"
             >
               <div className="space-y-4">
-                <div className="bg-stone-50 dark:bg-stone-950 p-4 rounded-2xl border border-stone-100 dark:border-stone-850 flex items-center justify-center">
-                  {renderIllustration(scheme.iconName)}
+                <div className="bg-stone-50 dark:bg-stone-950 p-2 rounded-2xl border border-stone-100 dark:border-stone-850 flex items-center justify-center">
+                  {renderIllustration(scheme.iconName, scheme.slug)}
                 </div>
 
                 <div className="space-y-1">
