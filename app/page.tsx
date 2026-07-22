@@ -30,59 +30,59 @@ export const metadata = {
 export default function Home() {
   const quickAccessModules = [
     {
-      icon: <Wheat className="h-8 w-8 text-emerald-700 dark:text-emerald-400" />,
+      icon: <Wheat className="h-9 w-9 text-emerald-700 dark:text-emerald-400" />,
       titleHi: "मंडी भाव",
       titleEn: "Mandi Bhav",
       descHi: "देश की 1,000+ मंडियों के आज के लाइव भाव और पिछले 7 दिनों का ट्रेंड ग्राफ देखें।",
       href: "/mandi-bhav",
-      bgGradient: "from-emerald-50 to-green-100/60 dark:from-emerald-950/40 dark:to-emerald-900/20",
-      borderColor: "border-emerald-200 dark:border-emerald-800/40",
+      bgGradient: "bg-emerald-50/70 dark:bg-emerald-950/20",
+      borderColor: "border-emerald-200/80 dark:border-emerald-800/30",
+      accentBadge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
       badge: "लाइव रेट्स",
-      imgSrc: "/images/mandi_market.jpg",
     },
     {
-      icon: <CloudSun className="h-8 w-8 text-sky-700 dark:text-sky-400" />,
+      icon: <CloudSun className="h-9 w-9 text-sky-700 dark:text-sky-400" />,
       titleHi: "मौसम पूर्वानुमान",
       titleEn: "Weather Forecast",
       descHi: "750+ जिलों में बारिश, तापमान और आंधी की सटीक 7-दिवसीय चेतावनी।",
       href: "/weather",
-      bgGradient: "from-sky-50 to-blue-100/60 dark:from-sky-950/40 dark:to-sky-900/20",
-      borderColor: "border-sky-200 dark:border-sky-800/40",
+      bgGradient: "bg-sky-50/70 dark:bg-sky-950/20",
+      borderColor: "border-sky-200/80 dark:border-sky-800/30",
+      accentBadge: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
       badge: "उपग्रह अलर्ट",
-      imgSrc: "/images/weather_station.jpg",
     },
     {
-      icon: <MessageSquareText className="h-8 w-8 text-purple-700 dark:text-purple-400" />,
+      icon: <MessageSquareText className="h-9 w-9 text-purple-700 dark:text-purple-400" />,
       titleHi: "किसान साथी AI",
       titleEn: "Kisan Sathi AI",
       descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7 पाएं।",
       href: "/kisan-sathi",
-      bgGradient: "from-purple-50 to-indigo-100/60 dark:from-purple-950/40 dark:to-purple-900/20",
-      borderColor: "border-purple-200 dark:border-purple-800/40",
+      bgGradient: "bg-purple-50/70 dark:bg-purple-950/20",
+      borderColor: "border-purple-200/80 dark:border-purple-800/30",
+      accentBadge: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300",
       badge: "24x7 असिस्टेंट",
-      imgSrc: "/images/ai_assistant.jpg",
     },
     {
-      icon: <CalendarDays className="h-8 w-8 text-amber-700 dark:text-amber-400" />,
+      icon: <CalendarDays className="h-9 w-9 text-amber-700 dark:text-amber-400" />,
       titleHi: "सरकारी योजनाएं",
       titleEn: "Government Schemes",
       descHi: "PM-किसान 23वीं किस्त, फसल बीमा और कृषि सब्सिडी का direct लिंक।",
       href: "/schemes",
-      bgGradient: "from-amber-50 to-yellow-100/60 dark:from-amber-950/40 dark:to-amber-900/20",
-      borderColor: "border-amber-200 dark:border-amber-800/40",
+      bgGradient: "bg-amber-50/70 dark:bg-amber-950/20",
+      borderColor: "border-amber-200/80 dark:border-amber-800/30",
+      accentBadge: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
       badge: "सरकारी पोर्टल",
-      imgSrc: null,
     },
     {
-      icon: <Newspaper className="h-8 w-8 text-teal-700 dark:text-teal-400" />,
+      icon: <Newspaper className="h-9 w-9 text-teal-700 dark:text-teal-400" />,
       titleHi: "समाचार व सलाह",
       titleEn: "Agri News & Advisory",
       descHi: "वैज्ञानिक खेती, नई तकनीक, बीज वेरायटी और दैनिक कृषि बुलेटिन।",
       href: "/news",
-      bgGradient: "from-teal-50 to-cyan-100/60 dark:from-teal-950/40 dark:to-teal-900/20",
-      borderColor: "border-teal-200 dark:border-teal-800/40",
+      bgGradient: "bg-teal-50/70 dark:bg-teal-950/20",
+      borderColor: "border-teal-200/80 dark:border-teal-800/30",
+      accentBadge: "bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300",
       badge: "दैनिक अपडेट",
-      imgSrc: null,
     },
   ];
 
@@ -96,7 +96,7 @@ export default function Home() {
   return (
     <div className="flex-grow flex flex-col bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       
-      {/* 1. HERO SECTION WITH RICH GRAPHICS & FARMER IMAGE */}
+      {/* 1. HERO SECTION WITH SEAMLESS BLENDED HERO IMAGE */}
       <section className="relative w-full py-12 md:py-20 overflow-hidden border-b border-kisan-cream-200 dark:border-kisan-green-900/20 bg-gradient-to-b from-emerald-900/10 via-white to-kisan-cream-100 dark:from-emerald-950/40 dark:via-stone-950 dark:to-stone-950">
         
         <div className="absolute top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -150,7 +150,7 @@ export default function Home() {
               </form>
             </div>
 
-            {/* Right Visual Image Column */}
+            {/* Right Seamless Visual Hero Card */}
             <div className="lg:col-span-5 relative flex justify-center">
               <div className="relative w-full max-w-md aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 group">
                 <Image
@@ -161,8 +161,8 @@ export default function Home() {
                   sizes="(max-width: 768px) 100vw, 500px"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white space-y-1">
-                  <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black uppercase">
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent flex flex-col justify-end p-6 text-white space-y-1">
+                  <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black uppercase tracking-wider">
                     <CheckCircle2 className="h-4 w-4" />
                     <span>सत्यापित कृषि पोर्टल</span>
                   </div>
@@ -178,7 +178,7 @@ export default function Home() {
             {stats.map((st) => (
               <div
                 key={st.label}
-                className="bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border border-stone-200 dark:border-stone-800 p-4 rounded-2xl shadow-xs flex items-center gap-3 text-left"
+                className="bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border border-stone-200 dark:border-stone-800 p-4 rounded-2xl shadow-xs flex items-center gap-3 text-left"
               >
                 <div className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 shrink-0">
                   {st.icon}
@@ -198,7 +198,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. MODULE CARDS GRID */}
+      {/* 2. ELEGANT HARMONIOUS MODULE CARDS GRID */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider border border-emerald-200">
@@ -215,14 +215,14 @@ export default function Home() {
             <Link
               key={m.href}
               href={m.href}
-              className={`p-6 rounded-3xl bg-gradient-to-b ${m.bgGradient} border ${m.borderColor} shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden`}
+              className={`p-6 rounded-3xl ${m.bgGradient} border ${m.borderColor} shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden`}
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 rounded-2xl bg-white dark:bg-stone-900 shadow-sm group-hover:scale-110 transition-transform">
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-stone-900 shadow-sm group-hover:scale-110 transition-transform">
                     {m.icon}
                   </div>
-                  <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800">
+                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${m.accentBadge}`}>
                     {m.badge}
                   </span>
                 </div>
@@ -239,18 +239,6 @@ export default function Home() {
                 <p className="text-stone-600 dark:text-stone-300 text-sm leading-relaxed font-medium">
                   {m.descHi}
                 </p>
-
-                {m.imgSrc && (
-                  <div className="relative w-full h-28 rounded-xl overflow-hidden mt-2 border border-stone-200/40 shadow-2xs">
-                    <Image
-                      src={m.imgSrc}
-                      alt={m.titleHi}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 300px"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
               </div>
 
               <div className="pt-6 flex items-center text-emerald-700 dark:text-emerald-400 font-extrabold text-sm gap-1 group-hover:gap-2 transition-all">
@@ -388,7 +376,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 space-y-3 shadow-xs">
-            <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400 w-fit">
+            <div className="p-3.5 rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400 w-fit">
               <ShieldCheck className="h-7 w-7" />
             </div>
             <h3 className="text-xl font-bold text-stone-900 dark:text-white">100% सरकारी डेटा</h3>
@@ -398,7 +386,7 @@ export default function Home() {
           </div>
 
           <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 space-y-3 shadow-xs">
-            <div className="p-3 rounded-2xl bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-400 w-fit">
+            <div className="p-3.5 rounded-2xl bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-400 w-fit">
               <RefreshCw className="h-7 w-7" />
             </div>
             <h3 className="text-xl font-bold text-stone-900 dark:text-white">दैनिक लाइव अपडेट</h3>
@@ -408,7 +396,7 @@ export default function Home() {
           </div>
 
           <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 space-y-3 shadow-xs">
-            <div className="p-3 rounded-2xl bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-400 w-fit">
+            <div className="p-3.5 rounded-2xl bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-400 w-fit">
               <Award className="h-7 w-7" />
             </div>
             <h3 className="text-xl font-bold text-stone-900 dark:text-white">हमेशा 100% नि:शुल्क</h3>
@@ -419,7 +407,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. FARMER TESTIMONIALS SECTION */}
+      {/* 5. FARMER TESTIMONIALS SECTION WITH MATCHING AVATARS */}
       <section className="py-16 bg-gradient-to-b from-white to-kisan-cream-50 dark:from-stone-900/30 dark:to-stone-950 border-t border-stone-200 dark:border-stone-850">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center space-y-2">
@@ -442,12 +430,18 @@ export default function Home() {
                 {"\"मैंने किसान साथी के मंडी भाव पेज पर इंदौर मंडी में सोयाबीन का भाव देखा था। पिछले 7 दिनों का ट्रेंड ग्राफ देखकर मुझे सही दाम का अंदाजा लग गया और मैंने अपनी फसल को सही समय पर बेचा जिससे काफी लाभ हुआ।\""}
               </p>
               <div className="flex items-center gap-3 pt-2 border-t border-stone-100 dark:border-stone-800">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-base">
-                  RP
+                <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border-2 border-emerald-500">
+                  <Image
+                    src="/images/rajesh_patidar.png"
+                    alt="Rajesh Patidar"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                  />
                 </div>
                 <div>
-                  <h4 className="font-bold text-stone-900 dark:text-white text-sm">श्री राजेश पाटीदार</h4>
-                  <p className="text-xs text-stone-500">सोयाबीन उत्पादक किसान, उज्जैन (मध्य प्रदेश)</p>
+                  <h4 className="font-bold text-stone-900 dark:text-white text-base">श्री राजेश पाटीदार</h4>
+                  <p className="text-xs text-stone-500 font-semibold">सोयाबीन उत्पादक किसान, उज्जैन (मध्य प्रदेश)</p>
                 </div>
               </div>
             </div>
@@ -462,12 +456,18 @@ export default function Home() {
                 {"\"पीएम-किसान सम्मान निधि की किस्त का स्टेटस चेक करना अब बहुत आसान हो गया है। साथ ही 750+ जिलों के मौसम पूर्वानुमान से फसल में दवाई छिड़कने का सही समय तय कर पाता हूँ।\""}
               </p>
               <div className="flex items-center gap-3 pt-2 border-t border-stone-100 dark:border-stone-800">
-                <div className="h-10 w-10 rounded-full bg-amber-100 text-amber-800 font-extrabold flex items-center justify-center text-base">
-                  RS
+                <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border-2 border-amber-500">
+                  <Image
+                    src="/images/rampal_singh.png"
+                    alt="Rampal Singh"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                  />
                 </div>
                 <div>
-                  <h4 className="font-bold text-stone-900 dark:text-white text-sm">श्री रामपाल सिंह</h4>
-                  <p className="text-xs text-stone-500">धान उत्पादक किसान, होशंगाबाद (मध्य प्रदेश)</p>
+                  <h4 className="font-bold text-stone-900 dark:text-white text-base">श्री रामपाल सिंह</h4>
+                  <p className="text-xs text-stone-500 font-semibold">धान उत्पादक किसान, होशंगाबाद (मध्य प्रदेश)</p>
                 </div>
               </div>
             </div>
