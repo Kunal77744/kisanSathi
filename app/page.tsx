@@ -17,14 +17,30 @@ import {
   Clock,
   TrendingUp,
   Sparkles,
-  Star,
   Users,
   CheckCircle2,
+  HelpCircle,
 } from "lucide-react";
 
 export const metadata = {
-  title: "किसान साथी - आपकी खेती का विश्वसनीय डिजिटल साथी | KisanSathi",
-  description: "किसान साथी (KisanSathi) भारत के किसानों का प्रमुख डिजिटल कृषि पोर्टल है। यहाँ 36 राज्यों के मंडी भाव, लाइव मौसम पूर्वानुमान, सरकारी योजनाएं और AI कृषि सलाह प्राप्त करें।",
+  title: "आज का मंडी भाव (Mandi Bhav Today), मौसम & PM Kisan | किसान साथी",
+  description: "किसान साथी (KisanSathi) पर 36 राज्यों की 1,000+ मंडियों के आज के लाइव भाव (Mandi Rates), 7-दिवसीय मौसम पूर्वानुमान, PM-Kisan सम्मान निधि और 50+ फसलों की सरकारी दरें देखें।",
+  keywords: [
+    "आज का मंडी भाव",
+    "mandi bhav today",
+    "mandi rates india",
+    "agmarknet live price",
+    "इंदौर मंडी भाव",
+    "गेहूं भाव आज",
+    "सोयाबीन मंडी भाव",
+    "लहसुन भाव",
+    "मौसम पूर्वानुमान",
+    "pm kisan 23rd installment",
+    "kisan sathi",
+  ],
+  alternates: {
+    canonical: "https://ekisansaathi.vercel.app",
+  },
 };
 
 export default function Home() {
@@ -53,7 +69,7 @@ export default function Home() {
       icon: <MessageSquareText className="h-8 w-8 text-purple-700 dark:text-purple-400" />,
       titleHi: "किसान साथी AI",
       titleEn: "Kisan Sathi AI",
-      descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7 पाएं।",
+      descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7एं।",
       href: "/kisan-sathi",
       badge: "24x7 असिस्टेंट",
       accentBg: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300",
@@ -88,13 +104,63 @@ export default function Home() {
     { label: "संतुष्ट किसान भाई", val: "1,00,000+", icon: <Users className="h-5 w-5 text-purple-600" /> },
   ];
 
+  const faqData = [
+    {
+      q: "किसान साथी पर आज का मंडी भाव (Mandi Bhav) कहाँ से आता है?",
+      a: "किसान साथी पोर्टल पर प्रदर्शित सभी मंडी भाव भारत सरकार के कृषि एवं किसान कल्याण मंत्रालय के अधिकृत पोर्टल Agmarknet से सिंक किए जाते हैं। यह डेटा 100% सरकारी और प्रामाणिक होता है।",
+    },
+    {
+      q: "क्या किसान साथी सेवा का उपयोग पूरी तरह नि:शुल्क है?",
+      a: "जी हां, किसान साथी पोर्टल की सभी सेवाएं (मंडी भाव, मौसम पूर्वानुमान, AI किसान सलाहकार, और सरकारी योजनाएं) सभी किसान भाइयों के लिए 100% नि:शुल्क हैं।",
+    },
+    {
+      q: "PM-Kisan सम्मान निधि की 23वीं किस्त का स्टेटस कैसे चेक करें?",
+      a: "आप किसान साथी के 'सरकारी योजनाएं' सेक्शन में जाकर 'PM-Kisan' लिंक पर क्लिक करके सीधे अपना पंजीकरण संख्या या आधार दर्ज करके किस्त की स्थिति देख सकते हैं।",
+    },
+  ];
+
+  // Schema.org Structured Data
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "किसान साथी (KisanSathi)",
+    "url": "https://ekisansaathi.vercel.app",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://ekisansaathi.vercel.app/mandi-bhav?crop={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map((item) => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a,
+      },
+    })),
+  };
+
   return (
     <div className="flex-grow flex flex-col bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       
+      {/* JSON-LD Structured Data Insertion */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* 1. HERO SECTION - LIGHT, FRIENDLY & HARMONIOUS VECTOR GRAPHIC */}
       <section className="relative w-full py-12 md:py-16 overflow-hidden border-b border-kisan-cream-200 dark:border-kisan-green-900/20 bg-gradient-to-b from-emerald-100/50 via-kisan-cream-100 to-white dark:from-emerald-950/30 dark:via-stone-950 dark:to-stone-950">
         
-        {/* Soft Decorative Ambient Circles */}
         <div className="absolute top-10 left-10 w-80 h-80 bg-emerald-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-amber-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
@@ -397,70 +463,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. FARMER TESTIMONIALS SECTION */}
-      <section className="py-16 bg-gradient-to-b from-white to-kisan-cream-50 dark:from-stone-900/30 dark:to-stone-950 border-t border-stone-200 dark:border-stone-850">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      {/* 5. HOMEPAGE FAQ SECTION WITH SCHEMA MARKUP */}
+      <section className="py-16 bg-white dark:bg-stone-900/40 border-t border-stone-200 dark:border-stone-850">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider border border-emerald-200">
+              <HelpCircle className="h-4 w-4" />
+              <span>अक्सर पूछे जाने वाले सवाल (FAQ)</span>
+            </div>
             <h2 className="text-3xl font-extrabold text-stone-900 dark:text-white">
-              हमारे किसान भाइयों के अनुभव
+              मंडी भाव व पोर्टल से संबंधित मुख्य प्रश्न
             </h2>
-            <p className="text-stone-600 dark:text-stone-400 text-base font-medium">
-              देशभर के किसान साथी यूज़र्स का क्या कहना है:
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 space-y-4 shadow-sm">
-              <div className="flex items-center gap-1 text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
+          <div className="space-y-4">
+            {faqData.map((faq, idx) => (
+              <div
+                key={idx}
+                className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-2 shadow-2xs"
+              >
+                <h3 className="text-lg font-bold text-stone-900 dark:text-white flex items-center gap-2">
+                  <span className="text-emerald-600 font-extrabold">Q.</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="text-stone-600 dark:text-stone-300 text-sm leading-relaxed pl-6">
+                  {faq.a}
+                </p>
               </div>
-              <p className="text-stone-700 dark:text-stone-300 text-base italic leading-relaxed font-medium">
-                {"\"मैंने किसान साथी के मंडी भाव पेज पर इंदौर मंडी में सोयाबीन का भाव देखा था। पिछले 7 दिनों का ट्रेंड ग्राफ देखकर मुझे सही दाम का अंदाजा लग गया और मैंने अपनी फसल को सही समय पर बेचा जिससे काफी लाभ हुआ।\""}
-              </p>
-              <div className="flex items-center gap-3 pt-2 border-t border-stone-100 dark:border-stone-800">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border-2 border-emerald-500">
-                  <Image
-                    src="/images/rajesh_patidar.png"
-                    alt="Rajesh Patidar"
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <h4 className="font-bold text-stone-900 dark:text-white text-base">श्री राजेश पाटीदार</h4>
-                  <p className="text-xs text-stone-500 font-semibold">सोयाबीन उत्पादक किसान, उज्जैन (मध्य प्रदेश)</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 space-y-4 shadow-sm">
-              <div className="flex items-center gap-1 text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="text-stone-700 dark:text-stone-300 text-base italic leading-relaxed font-medium">
-                {"\"पीएम-किसान सम्मान निधि की किस्त का स्टेटस चेक करना अब बहुत आसान हो गया है। साथ ही 750+ जिलों के मौसम पूर्वानुमान से फसल में दवाई छिड़कने का सही समय तय कर पाता हूँ।\""}
-              </p>
-              <div className="flex items-center gap-3 pt-2 border-t border-stone-100 dark:border-stone-800">
-                <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border-2 border-amber-500">
-                  <Image
-                    src="/images/rampal_singh.png"
-                    alt="Rampal Singh"
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <h4 className="font-bold text-stone-900 dark:text-white text-base">श्री रामपाल सिंह</h4>
-                  <p className="text-xs text-stone-500 font-semibold">धान उत्पादक किसान, होशंगाबाद (मध्य प्रदेश)</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

@@ -36,7 +36,7 @@ export function buildCropPageMetadata(crop: string) {
       `aaj ka ${cropHindi} mandi bhav`
     ],
     alternates: {
-      canonical: `/mandi-bhav/crop/${slugify(cropEnglish)}`,
+      canonical: `https://ekisansaathi.vercel.app/mandi-bhav/crop/${slugify(cropEnglish)}`,
     },
   };
 }

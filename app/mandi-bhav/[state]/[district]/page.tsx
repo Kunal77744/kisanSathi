@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: RouteParams) {
     title: `${districtHindi} (${district}) मंडी भाव आज का रेट - ${stateHindi} | kisanSathi`,
     description: `${districtHindi} मंडी भाव आज का रेट: ${districtHindi} में गेहूं, सोयाबीन, चना, मक्का के ताज़ा बाजार भाव, दैनिक आवक दरें और साप्ताहिक उतार-चढ़ाव देखें।`,
     alternates: {
-      canonical: `/mandi-bhav/${stateParam}/${districtParam}`,
+      canonical: `https://ekisansaathi.vercel.app/mandi-bhav/${stateParam}/${districtParam}`,
     },
   };
 }
