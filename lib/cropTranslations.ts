@@ -2,7 +2,7 @@
 // Maps English database entries (crops, districts, mandis) to Hindi for localized display.
 
 export const cropTranslations: Record<string, string> = {
-  // Common Crops
+  // Common Crops & Grains
   wheat: "गेहूं",
   paddy: "धान",
   "paddy(dhan)": "धान",
@@ -75,86 +75,20 @@ export const cropTranslations: Record<string, string> = {
   mango: "आम",
   lemon: "नींबू",
   lime: "नींबू",
+  sugarcane: "गन्ना",
+  pearlmillet: "बाजरा",
+  bajra: "बाजरा",
+  sorghum: "ज्वार",
+  jowar: "ज्वार",
+  barley: "जौ",
+  cumin: "जीरा",
+  jeera: "जीरा",
+  fennel: "सौंफ",
+  fenugreek: "मेथी",
+  sesame: "तिल",
+  til: "तिल",
+  sunflower: "सूरजमुखी",
 };
-
-export const districtTranslations: Record<string, string> = {
-  // Madhya Pradesh Districts
-  indore: "इंदौर",
-  bhopal: "भोपाल",
-  ujjain: "उज्जैन",
-  dewas: "देवास",
-  dhar: "धार",
-  sehore: "सीहोर",
-  neemuch: "नीमच",
-  mandsaur: "मंदसौर",
-  jabalpur: "जबलपुर",
-  gwalior: "ग्वालियर",
-  narmadapuram: "नर्मदापुरम",
-  hoshangabad: "होशंगाबाद",
-  khargone: "खरगोन",
-  khandwa: "खंडवा",
-  ratlam: "रतलाम",
-  shajapur: "शाजापुर",
-  guna: "गुना",
-  sagar: "सागर",
-  rewas: "रीवा",
-  satna: "सतना",
-};
-
-export const mandiTranslations: Record<string, string> = {
-  // Madhya Pradesh APMC Mandis
-  indore: "इंदौर मंडी",
-  bhopal: "भोपाल मंडी",
-  ujjain: "उज्जैन मंडी",
-  dewas: "देवास मंडी",
-  dhamnod: "धामनोद मंडी",
-  pipariya: "पिपरिया मंडी",
-  ashta: "आष्टा मंडी",
-  neemuch: "नीमच मंडी",
-  mandsaur: "मंदसौर मंडी",
-  jabalpur: "जबलपुर मंडी",
-  karwan: "करवन मंडी",
-  sanawad: "सनावद मंडी",
-  harda: "हरदा मंडी",
-  itarsi: "इटारसी मंडी",
-  timarni: "टिमरनी मंडी",
-  badnawar: "बदनावर मंडी",
-};
-
-/**
- * Standardizes a string by converting it to lowercase and trimming whitespaces
- * for consistent dictionary lookups.
- */
-function normalize(str: string): string {
-  return String(str || "").trim().toLowerCase();
-}
-
-/**
- * Translates a crop name to Hindi if requested and available, else falls back to English.
- */
-export function translateCrop(crop: string, lang: "en" | "hi"): string {
-  if (lang !== "hi") return crop;
-  const key = normalize(crop);
-  return cropTranslations[key] || crop;
-}
-
-/**
- * Translates a district name to Hindi if requested and available, else falls back to English.
- */
-export function translateDistrict(district: string, lang: "en" | "hi"): string {
-  if (lang !== "hi") return district;
-  const key = normalize(district);
-  return districtTranslations[key] || district;
-}
-
-/**
- * Translates a mandi name to Hindi if requested and available, else falls back to English.
- */
-export function translateMandi(mandi: string, lang: "en" | "hi"): string {
-  if (lang !== "hi") return mandi;
-  const key = normalize(mandi);
-  return mandiTranslations[key] || mandi;
-}
 
 export const stateTranslations: Record<string, string> = {
   "madhya pradesh": "मध्य प्रदेश",
@@ -177,14 +111,157 @@ export const stateTranslations: Record<string, string> = {
   "uttarakhand": "उत्तराखंड",
   "himachal pradesh": "हिमाचल प्रदेश",
   "assam": "असम",
+  "tripura": "त्रिपुरा",
+  "meghalaya": "मेघालय",
+  "manipur": "मणिपुर",
+  "nagaland": "नागालैंड",
+  "goa": "गोवा",
+  "arunachal pradesh": "अरुणाचल प्रदेश",
+  "mizoram": "मिजोरम",
+  "sikkim": "सिक्किम",
+  "delhi": "दिल्ली",
+  "jammu and kashmir": "जम्मू और कश्मीर",
+  "ladakh": "लद्दाख",
+  "chandigarh": "चंडीगढ़",
+  "puducherry": "पुडुचेरी",
+  "andaman and nicobar islands": "अंडमान और निकोबार",
+  "dadra and nagar haveli and daman and diu": "दादरा और नगर हवेली",
+  "lakshadweep": "लक्षद्वीप",
 };
 
-/**
- * Translates a state name to Hindi if requested and available, else falls back to English.
- */
+export const districtTranslations: Record<string, string> = {
+  // Madhya Pradesh
+  indore: "इंदौर",
+  bhopal: "भोपाल",
+  ujjain: "उज्जैन",
+  dewas: "देवास",
+  dhar: "धार",
+  sehore: "सीहोर",
+  neemuch: "नीमच",
+  mandsaur: "मंदसौर",
+  jabalpur: "जबलपुर",
+  gwalior: "ग्वालियर",
+  narmadapuram: "नर्मदापुरम",
+  hoshangabad: "होशंगाबाद",
+  khargone: "खरगोन",
+  khandwa: "खंडवा",
+  ratlam: "रतलाम",
+  shajapur: "शाजापुर",
+  guna: "गुना",
+  sagar: "सागर",
+  rewa: "रीवा",
+  satna: "सतना",
+  chhindwara: "छिंदवाड़ा",
+  damoh: "दमोह",
+  vidisha: "विदिशा",
+  raisen: "रायसेन",
+
+  // Maharashtra
+  pune: "पुणे",
+  nashik: "नाशिक",
+  nagpur: "नागपुर",
+  solapur: "सोलापुर",
+  ahmednagar: "अहमदनगर",
+  aurangabad: "छत्रपति संभाजीनगर",
+  satara: "सतारा",
+  kolhapur: "कोल्हापुर",
+
+  // Rajasthan
+  jaipur: "जयपुर",
+  jodhpur: "जोधपुर",
+  kota: "कोटा",
+  bikaner: "बीकानेर",
+  alwar: "अलवर",
+  ganganagar: "श्री गंगानगर",
+  hanumangarh: "हनुमानगढ़",
+  nagaur: "नागौर",
+  chittorgarh: "चित्तौड़गढ़",
+
+  // Uttar Pradesh
+  agra: "आगरा",
+  kanpur: "कानपुर",
+  lucknow: "लखनऊ",
+  varanasi: "वाराणसी",
+  mathura: "मथुरा",
+  bareilly: "बरेली",
+  aligarh: "अलीगढ़",
+  meerut: "मेरठ",
+
+  // Gujarat
+  ahmedabad: "अहमदाबाद",
+  surat: "सूरत",
+  rajkot: "राजकोट",
+  vadodara: "वडोदरा",
+  junagadh: "जूनागढ़",
+  amreli: "अमरेली",
+
+  // Punjab & Haryana
+  ludhiana: "लुधियाना",
+  amritsar: "अमृतसर",
+  jalandhar: "जालंधर",
+  patiala: "पटियाला",
+  ambala: "अंबाला",
+  karnal: "करनाल",
+  hisar: "हिसार",
+  rohtak: "रोहतक",
+
+  // Bihar
+  patna: "पटना",
+  gaya: "गया",
+  muzaffarpur: "मुजफ्फरपुर",
+  bhagalpur: "भागलपुर",
+};
+
+export const mandiTranslations: Record<string, string> = {
+  indore: "इंदौर मंडी",
+  bhopal: "भोपाल मंडी",
+  ujjain: "उज्जैन मंडी",
+  dewas: "देवास मंडी",
+  dhamnod: "धामनोद मंडी",
+  pipariya: "पिपरिया मंडी",
+  ashta: "आष्टा मंडी",
+  neemuch: "नीमच मंडी",
+  mandsaur: "मंदसौर मंडी",
+  jabalpur: "जबलपुर मंडी",
+  karwan: "करवन मंडी",
+  sanawad: "सनावद मंडी",
+  harda: "हरदा मंडी",
+  itarsi: "इटारसी मंडी",
+  timarni: "टिमरनी मंडी",
+  badnawar: "बदनावर मंडी",
+  "pune apmc": "पुणे APMC मंडी",
+  lasalgaon: "लासलगांव प्याज मंडी",
+  "agra mandi": "आगरा मंडी",
+  "ambala apmc": "अंबाला APMC मंडी",
+  "jaipur mandi": "जयपुर मंडी",
+  "kota mandi": "कोटा भामाशाह मंडी",
+  "rajkot mandi": "राजकोट बेडी मंडी",
+};
+
+function normalize(str: string): string {
+  return String(str || "").trim().toLowerCase();
+}
+
+export function translateCrop(crop: string, lang: "en" | "hi"): string {
+  if (lang !== "hi") return crop;
+  const key = normalize(crop);
+  return cropTranslations[key] || crop;
+}
+
+export function translateDistrict(district: string, lang: "en" | "hi"): string {
+  if (lang !== "hi") return district;
+  const key = normalize(district);
+  return districtTranslations[key] || district;
+}
+
+export function translateMandi(mandi: string, lang: "en" | "hi"): string {
+  if (lang !== "hi") return mandi;
+  const key = normalize(mandi);
+  return mandiTranslations[key] || mandi;
+}
+
 export function translateState(state: string, lang: "en" | "hi"): string {
   if (lang !== "hi") return state;
   const key = normalize(state);
   return stateTranslations[key] || state;
 }
-

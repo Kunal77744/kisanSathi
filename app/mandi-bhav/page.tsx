@@ -8,6 +8,7 @@ import MandiTable from "@/components/mandi-bhav/MandiTable";
 import { slugify } from "@/lib/utils";
 import { getMandiPrices } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
+import districtsData from "@/data/india-districts.json";
 
 
 
@@ -24,68 +25,76 @@ export const metadata = {
 // Invalidate cache immediately on new imports using revalidateTag("mandi-filters").
 const getCachedFilters = unstable_cache(
   async () => {
+    const allIndiaStatesMap = new Map<string, { state: string }>();
+    districtsData.forEach(d => {
+      if (d.state && !allIndiaStatesMap.has(d.state.toLowerCase())) {
+        allIndiaStatesMap.set(d.state.toLowerCase(), { state: d.state });
+      }
+    });
+    const allIndiaStates = Array.from(allIndiaStatesMap.values()).sort((a, b) => a.state.localeCompare(b.state));
+
+    const allIndiaDistricts = districtsData.map(d => ({ district: d.district, state: d.state }));
+
+    const rawCropSet = new Set<string>([
+      "Wheat", "Soybean", "Gram", "Garlic", "Onion", "Potato", "Tomato", "Paddy", "Cotton",
+      "Mustard", "Maize", "Chilli", "Turmeric", "Ginger", "Moong", "Urad", "Masoor", "Peas",
+      "Groundnut", "Coriander", "Cumin", "Fennel", "Fenugreek", "Sugarcane", "Bajra", "Jowar",
+      "Apple", "Banana", "Orange", "Papaya", "Pomegranate", "Lemon", "Cabbage", "Cauliflower",
+      "Brinjal", "Okra", "Bottle Gourd", "Bitter Gourd"
+    ]);
+    const allIndiaCrops = Array.from(rawCropSet).sort().map(c => ({ crop: c }));
+
+    const fallbackMandis = [
+      { mandi: "Indore", district: "Indore", state: "Madhya Pradesh" },
+      { mandi: "Bhopal", district: "Bhopal", state: "Madhya Pradesh" },
+      { mandi: "Dhamnod", district: "Dhar", state: "Madhya Pradesh" },
+      { mandi: "Pune APMC", district: "Pune", state: "Maharashtra" },
+      { mandi: "Lasalgaon", district: "Nashik", state: "Maharashtra" },
+      { mandi: "Agra Mandi", district: "Agra", state: "Uttar Pradesh" },
+      { mandi: "Ambala APMC", district: "Ambala", state: "Haryana" },
+      { mandi: "Kota Mandi", district: "Kota", state: "Rajasthan" },
+      { mandi: "Jaipur Mandi", district: "Jaipur", state: "Rajasthan" },
+      { mandi: "Rajkot Mandi", district: "Rajkot", state: "Gujarat" },
+    ];
+
     try {
       const [distinctStates, distinctDistricts, distinctMandis, distinctCrops] = await Promise.all([
-        prisma.mandiPrice.findMany({
-          select: { state: true },
-          distinct: ["state"],
-          orderBy: { state: "asc" },
-        }),
-        prisma.mandiPrice.findMany({
-          select: { district: true, state: true },
-          distinct: ["district", "state"],
-          orderBy: { district: "asc" },
-        }),
-        prisma.mandiPrice.findMany({
-          select: { mandi: true, district: true, state: true },
-          distinct: ["mandi", "district", "state"],
-          orderBy: { mandi: "asc" },
-        }),
-        prisma.mandiPrice.findMany({
-          select: { crop: true },
-          distinct: ["crop"],
-          orderBy: { crop: "asc" },
-        })
+        prisma.mandiPrice.findMany({ select: { state: true }, distinct: ["state"], orderBy: { state: "asc" } }),
+        prisma.mandiPrice.findMany({ select: { district: true, state: true }, distinct: ["district", "state"], orderBy: { district: "asc" } }),
+        prisma.mandiPrice.findMany({ select: { mandi: true, district: true, state: true }, distinct: ["mandi", "district", "state"], orderBy: { mandi: "asc" } }),
+        prisma.mandiPrice.findMany({ select: { crop: true }, distinct: ["crop"], orderBy: { crop: "asc" } }),
       ]);
+
+      // Merge DB items with All-India list
+      const stateSet = new Set(distinctStates.map(s => s.state.toLowerCase()));
+      allIndiaStates.forEach(s => {
+        if (!stateSet.has(s.state.toLowerCase())) distinctStates.push(s);
+      });
+
+      const districtSet = new Set(distinctDistricts.map(d => `${d.state.toLowerCase()}|${d.district.toLowerCase()}`));
+      allIndiaDistricts.forEach(d => {
+        const key = `${d.state.toLowerCase()}|${d.district.toLowerCase()}`;
+        if (!districtSet.has(key)) distinctDistricts.push(d);
+      });
+
+      const cropSet = new Set(distinctCrops.map(c => c.crop.toLowerCase()));
+      allIndiaCrops.forEach(c => {
+        if (!cropSet.has(c.crop.toLowerCase())) distinctCrops.push(c);
+      });
+
+      const mandiSet = new Set(distinctMandis.map(m => m.mandi.toLowerCase()));
+      fallbackMandis.forEach(m => {
+        if (!mandiSet.has(m.mandi.toLowerCase())) distinctMandis.push(m);
+      });
+
       return { distinctStates, distinctDistricts, distinctMandis, distinctCrops };
     } catch (error) {
-      console.error("[getCachedFilters error - using fallback]:", error);
+      console.error("[getCachedFilters error - using All-India dataset]:", error);
       return {
-        distinctStates: [
-          { state: "Madhya Pradesh" },
-          { state: "Maharashtra" },
-          { state: "Uttar Pradesh" },
-          { state: "Haryana" },
-        ],
-        distinctDistricts: [
-          { district: "Indore", state: "Madhya Pradesh" },
-          { district: "Bhopal", state: "Madhya Pradesh" },
-          { district: "Dhar", state: "Madhya Pradesh" },
-          { district: "Ujjain", state: "Madhya Pradesh" },
-          { district: "Pune", state: "Maharashtra" },
-          { district: "Nashik", state: "Maharashtra" },
-          { district: "Agra", state: "Uttar Pradesh" },
-          { district: "Ambala", state: "Haryana" },
-        ],
-        distinctMandis: [
-          { mandi: "Indore", district: "Indore", state: "Madhya Pradesh" },
-          { mandi: "Bhopal", district: "Bhopal", state: "Madhya Pradesh" },
-          { mandi: "Dhamnod", district: "Dhar", state: "Madhya Pradesh" },
-          { mandi: "Pune APMC", district: "Pune", state: "Maharashtra" },
-          { mandi: "Lasalgaon", district: "Nashik", state: "Maharashtra" },
-          { mandi: "Agra Mandi", district: "Agra", state: "Uttar Pradesh" },
-          { mandi: "Ambala APMC", district: "Ambala", state: "Haryana" },
-        ],
-        distinctCrops: [
-          { crop: "Wheat" },
-          { crop: "Soybean" },
-          { crop: "Gram" },
-          { crop: "Garlic" },
-          { crop: "Onion" },
-          { crop: "Potato" },
-          { crop: "Paddy" },
-          { crop: "Cotton" },
-        ],
+        distinctStates: allIndiaStates,
+        distinctDistricts: allIndiaDistricts,
+        distinctMandis: fallbackMandis,
+        distinctCrops: allIndiaCrops,
       };
     }
   },

@@ -1,10 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ChevronRight, ArrowLeft, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
-import { getPriceTrend } from "@/lib/mandiQueries";
+import { getMandiPrices, getPriceTrend } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
 import { translateCrop } from "@/lib/cropTranslations";
 import { buildCropPageMetadata, resolveCropBySlug } from "@/lib/cropPageMetadata";
@@ -18,79 +17,73 @@ interface RouteParams {
   };
 }
 
+const DEFAULT_CROPS = [
+  "Wheat", "Soybean", "Gram", "Garlic", "Onion", "Potato", "Tomato", "Paddy", "Cotton",
+  "Mustard", "Maize", "Chilli", "Turmeric", "Ginger", "Moong", "Urad", "Masoor", "Peas",
+  "Groundnut", "Coriander", "Cumin", "Fennel", "Sugarcane", "Bajra", "Jowar", "Apple", "Banana",
+  "Orange", "Papaya", "Pomegranate", "Lemon", "Cabbage", "Cauliflower", "Brinjal", "Okra"
+];
+
 export async function generateStaticParams() {
   try {
     const items = await prisma.mandiPrice.findMany({
       select: { crop: true },
       distinct: ["crop"],
     });
-
-    return items
-      .filter((item) => item.crop)
-      .map((item) => ({
-        crop: slugify(item.crop),
-      }));
+    const dbCropSlugs = items.filter((item) => item.crop).map((item) => ({ crop: slugify(item.crop) }));
+    const defaultCropSlugs = DEFAULT_CROPS.map((c) => ({ crop: slugify(c) }));
+    const combinedMap = new Map<string, { crop: string }>();
+    [...defaultCropSlugs, ...dbCropSlugs].forEach(item => combinedMap.set(item.crop, item));
+    return Array.from(combinedMap.values());
   } catch (error) {
     console.error("[generateStaticParams error]:", error);
-    return [];
+    return DEFAULT_CROPS.map((c) => ({ crop: slugify(c) }));
   }
 }
 
 export async function generateMetadata({ params }: RouteParams) {
   const cropParam = params.crop;
-
-  const distinctCrops = await prisma.mandiPrice.findMany({
-    select: { crop: true },
-    distinct: ["crop"],
-  });
-  const matchedCrop = resolveCropBySlug(
-    distinctCrops.map(({ crop }) => crop),
-    cropParam
-  );
-
-  if (!matchedCrop) {
-    notFound();
+  let dbCropNames: string[] = [];
+  try {
+    const distinctCrops = await prisma.mandiPrice.findMany({
+      select: { crop: true },
+      distinct: ["crop"],
+    });
+    dbCropNames = distinctCrops.map(({ crop }) => crop);
+  } catch (e) {
+    console.error("[generateMetadata error]:", e);
   }
 
+  const matchedCrop = resolveCropBySlug(dbCropNames, cropParam) || cropParam;
   return buildCropPageMetadata(matchedCrop);
 }
 
 export default async function CropMandiPage({ params }: RouteParams) {
   const cropParam = params.crop;
 
-  // Resolve matching crop name from DB list
-  const distinctCrops = await prisma.mandiPrice.findMany({
-    select: { crop: true },
-    distinct: ["crop"],
-  });
-  const matchedCrop = resolveCropBySlug(
-    distinctCrops.map(({ crop }) => crop),
-    cropParam
-  );
-
-  if (!matchedCrop) {
-    notFound();
+  let dbCropNames: string[] = [];
+  try {
+    const distinctCrops = await prisma.mandiPrice.findMany({
+      select: { crop: true },
+      distinct: ["crop"],
+    });
+    dbCropNames = distinctCrops.map(({ crop }) => crop);
+  } catch (e) {
+    console.error("[CropMandiPage db query error]:", e);
   }
 
+  const matchedCrop = resolveCropBySlug(dbCropNames, cropParam) || cropParam;
   const cropHindi = translateCrop(matchedCrop, "hi");
 
-  // Fetch today's records for this crop, sorted by modalPrice desc (highest price first)
-  // We look at the most recent 100 entries in the DB to keep pages performant
-  const priceRecords = await prisma.mandiPrice.findMany({
-    where: {
-      crop: matchedCrop,
-    },
-    orderBy: [
-      { date: "desc" },
-      { modalPrice: "desc" }
-    ],
-    take: 100,
+  // Fetch records using shared getMandiPrices query with fallback resilience
+  const { priceRecords } = await getMandiPrices({
+    crop: matchedCrop,
+    page: 1,
+    pageSize: 100,
   });
 
-  // Sort by modalPrice desc in memory to ensure highest rates are absolutely pinned to the top
   const sortedRecords = [...priceRecords].sort((a, b) => b.modalPrice - a.modalPrice);
 
-  // Compute trends for the records shown
   const priceRecordsWithTrends = await Promise.all(
     sortedRecords.map(async (record) => {
       const trend = await getPriceTrend(
