@@ -16,18 +16,69 @@ export const metadata = {
 };
 
 export default function NewsListingPage() {
-  const renderIllustration = (name: string) => {
-    switch (name) {
-      case "RainCloud":
-        return <RainCloudIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "Coins":
-        return <CoinsIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "Advisory":
-        return <AdvisoryIllustration className="w-full h-40 object-contain rounded-xl" />;
-      case "MSP":
-        return <MSPIllustration className="w-full h-40 object-contain rounded-xl" />;
+  const renderIllustration = (name: string, slug: string) => {
+    switch (slug) {
+      case "monsoon-delay":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/weather_banner.png"
+              alt="Monsoon Delay News"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "pm-kisan-23rd":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/pm_kisan_card.png"
+              alt="PM Kisan 23rd Installment"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "delayed-monsoon-advisory":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/news_banner.png"
+              alt="Agri Advisory News"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      case "kharif-msp-2026-27":
+        return (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-xs">
+            <Image
+              src="/images/schemes_banner.png"
+              alt="Kharif MSP News"
+              fill
+              sizes="(max-width: 768px) 100vw, 350px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
       default:
-        return <AdvisoryIllustration className="w-full h-40 object-contain rounded-xl" />;
+        switch (name) {
+          case "RainCloud":
+            return <RainCloudIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "Coins":
+            return <CoinsIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "Advisory":
+            return <AdvisoryIllustration className="w-full h-40 object-contain rounded-xl" />;
+          case "MSP":
+            return <MSPIllustration className="w-full h-40 object-contain rounded-xl" />;
+          default:
+            return <AdvisoryIllustration className="w-full h-40 object-contain rounded-xl" />;
+        }
     }
   };
 
@@ -84,11 +135,11 @@ export default function NewsListingPage() {
           {newsArticles.map((article) => (
             <div
               key={article.slug}
-              className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group"
             >
               <div className="space-y-4">
-                <div className="bg-stone-50 dark:bg-stone-950 p-4 rounded-2xl border border-stone-100 dark:border-stone-850 flex items-center justify-center">
-                  {renderIllustration(article.iconName)}
+                <div className="bg-stone-50 dark:bg-stone-950 p-2 rounded-2xl border border-stone-100 dark:border-stone-850 flex items-center justify-center">
+                  {renderIllustration(article.iconName, article.slug)}
                 </div>
 
                 <div className="space-y-2">
