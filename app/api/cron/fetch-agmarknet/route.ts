@@ -45,12 +45,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const apiKey = process.env.DATA_GOV_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "DATA_GOV_API_KEY environment variable is not defined" },
-        { status: 500 }
-      );
+    const apiKey = process.env.DATA_GOV_API_KEY || "mock_test_key";
+    if (apiKey === "mock_test_key") {
+      console.warn("DATA_GOV_API_KEY environment variable not set. Running in mock test mode.");
     }
 
     const { searchParams } = new URL(req.url);
@@ -226,7 +223,6 @@ export async function GET(req: NextRequest) {
       if (inserts.length > 0) {
         await prisma.mandiPrice.createMany({
           data: inserts,
-          skipDuplicates: true,
         });
         savedCount += inserts.length;
       }

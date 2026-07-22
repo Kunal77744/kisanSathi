@@ -142,6 +142,46 @@ export async function getMandiPrices(params: MandiQueryParams) {
     }
   }
 
+  // Fallback: If no explicit date parameter was provided and query returned 0 records,
+  // automatically find and display records from the most recent date available in DB.
+  if (!params.date && priceRecords.length === 0) {
+    try {
+      const baseWhereWithoutDate = { ...where };
+      delete baseWhereWithoutDate.date;
+
+      const latestRecord = await prisma.mandiPrice.findFirst({
+        where: baseWhereWithoutDate,
+        orderBy: { date: "desc" },
+        select: { date: true },
+      });
+
+      if (latestRecord && latestRecord.date) {
+        const fallbackDate = latestRecord.date.toISOString().split("T")[0];
+        const [fYear, fMonth, fDay] = fallbackDate.split("-").map(Number);
+        const fStartOfDay = new Date(Date.UTC(fYear, fMonth - 1, fDay, 0, 0, 0));
+        const fEndOfDay = new Date(Date.UTC(fYear, fMonth - 1, fDay, 23, 59, 59, 999));
+
+        where.date = {
+          gte: fStartOfDay,
+          lte: fEndOfDay,
+        };
+
+        priceRecords = await prisma.mandiPrice.findMany({
+          where,
+          orderBy: { date: "desc" },
+          skip: (currentPage - 1) * pageSize,
+          take: pageSize,
+        });
+
+        totalMatchingCount = await prisma.mandiPrice.count({
+          where,
+        });
+      }
+    } catch (fallbackError) {
+      console.error("[Mandi Queries Date Fallback Error]:", fallbackError);
+    }
+  }
+
   const totalPages = Math.ceil(totalMatchingCount / pageSize);
 
   // Check if database is empty overall
