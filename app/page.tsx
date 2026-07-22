@@ -30,59 +30,49 @@ export const metadata = {
 export default function Home() {
   const quickAccessModules = [
     {
-      icon: <Wheat className="h-9 w-9 text-emerald-700 dark:text-emerald-400" />,
+      icon: <Wheat className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />,
       titleHi: "मंडी भाव",
       titleEn: "Mandi Bhav",
       descHi: "देश की 1,000+ मंडियों के आज के लाइव भाव और पिछले 7 दिनों का ट्रेंड ग्राफ देखें।",
       href: "/mandi-bhav",
-      bgGradient: "bg-emerald-50/70 dark:bg-emerald-950/20",
-      borderColor: "border-emerald-200/80 dark:border-emerald-800/30",
-      accentBadge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
       badge: "लाइव रेट्स",
+      accentBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40",
     },
     {
-      icon: <CloudSun className="h-9 w-9 text-sky-700 dark:text-sky-400" />,
+      icon: <CloudSun className="h-8 w-8 text-sky-600 dark:text-sky-400" />,
       titleHi: "मौसम पूर्वानुमान",
       titleEn: "Weather Forecast",
       descHi: "750+ जिलों में बारिश, तापमान और आंधी की सटीक 7-दिवसीय चेतावनी।",
       href: "/weather",
-      bgGradient: "bg-sky-50/70 dark:bg-sky-950/20",
-      borderColor: "border-sky-200/80 dark:border-sky-800/30",
-      accentBadge: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300",
       badge: "उपग्रह अलर्ट",
+      accentBg: "bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800/40",
     },
     {
-      icon: <MessageSquareText className="h-9 w-9 text-purple-700 dark:text-purple-400" />,
+      icon: <MessageSquareText className="h-8 w-8 text-purple-600 dark:text-purple-400" />,
       titleHi: "किसान साथी AI",
       titleEn: "Kisan Sathi AI",
       descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7 पाएं।",
       href: "/kisan-sathi",
-      bgGradient: "bg-purple-50/70 dark:bg-purple-950/20",
-      borderColor: "border-purple-200/80 dark:border-purple-800/30",
-      accentBadge: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300",
       badge: "24x7 असिस्टेंट",
+      accentBg: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/40",
     },
     {
-      icon: <CalendarDays className="h-9 w-9 text-amber-700 dark:text-amber-400" />,
+      icon: <CalendarDays className="h-8 w-8 text-amber-600 dark:text-amber-400" />,
       titleHi: "सरकारी योजनाएं",
       titleEn: "Government Schemes",
       descHi: "PM-किसान 23वीं किस्त, फसल बीमा और कृषि सब्सिडी का direct लिंक।",
       href: "/schemes",
-      bgGradient: "bg-amber-50/70 dark:bg-amber-950/20",
-      borderColor: "border-amber-200/80 dark:border-amber-800/30",
-      accentBadge: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
       badge: "सरकारी पोर्टल",
+      accentBg: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/40",
     },
     {
-      icon: <Newspaper className="h-9 w-9 text-teal-700 dark:text-teal-400" />,
+      icon: <Newspaper className="h-8 w-8 text-teal-600 dark:text-teal-400" />,
       titleHi: "समाचार व सलाह",
       titleEn: "Agri News & Advisory",
       descHi: "वैज्ञानिक खेती, नई तकनीक, बीज वेरायटी और दैनिक कृषि बुलेटिन।",
       href: "/news",
-      bgGradient: "bg-teal-50/70 dark:bg-teal-950/20",
-      borderColor: "border-teal-200/80 dark:border-teal-800/30",
-      accentBadge: "bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300",
       badge: "दैनिक अपडेट",
+      accentBg: "bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800/40",
     },
   ];
 
@@ -96,31 +86,43 @@ export default function Home() {
   return (
     <div className="flex-grow flex flex-col bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       
-      {/* 1. HERO SECTION WITH SEAMLESS BLENDED HERO IMAGE */}
-      <section className="relative w-full py-12 md:py-20 overflow-hidden border-b border-kisan-cream-200 dark:border-kisan-green-900/20 bg-gradient-to-b from-emerald-900/10 via-white to-kisan-cream-100 dark:from-emerald-950/40 dark:via-stone-950 dark:to-stone-950">
+      {/* 1. HERO SECTION WITH ELEGANT BACKGROUND IMAGE BLENDING */}
+      <section className="relative w-full py-16 md:py-28 overflow-hidden border-b border-stone-200 dark:border-stone-850">
         
-        <div className="absolute top-10 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-20 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Full-bleed Background Image with Professional Gradient Overlay */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/farmer_hero.jpg"
+            alt="Agriculture Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center scale-105 filter brightness-90"
+          />
+          {/* Multi-layer Gradient Overlay for Pristine Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-950/95 via-stone-950/80 to-emerald-950/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-transparent to-stone-950/90" />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-center lg:text-left">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
-            {/* Left Content Column */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            {/* Main Content Column */}
+            <div className="lg:col-span-8 space-y-6">
               
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 shadow-sm text-emerald-800 dark:text-emerald-300 font-extrabold text-xs sm:text-sm tracking-wide">
-                <Sparkles className="h-4 w-4 text-emerald-600 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/40 text-emerald-300 font-bold text-xs sm:text-sm tracking-wide shadow-lg">
+                <Sparkles className="h-4 w-4 text-emerald-400 animate-pulse" />
                 <span>भारत का 100% मुफ़्त डिजिटल कृषि पोर्टल (Govt API Verified)</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight">
                 किसान साथी — <br />
-                <span className="bg-gradient-to-r from-emerald-700 via-green-600 to-amber-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-green-300 dark:to-amber-400">
+                <span className="bg-gradient-to-r from-emerald-400 via-green-300 to-amber-300 bg-clip-text text-transparent">
                   आपकी हर फसल का सच्चा साथी
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-lg sm:text-xl text-stone-200 font-medium leading-relaxed max-w-2xl">
                 36 राज्यों की मंडियों के आज के ताज़ा भाव, 7-दिवसीय ग्राफ, मौसम चेतावनी और सरकारी योजनाओं की पूरी जानकारी एक ही जगह।
               </p>
 
@@ -128,16 +130,16 @@ export default function Home() {
               <form
                 action="/mandi-bhav"
                 method="GET"
-                className="relative flex items-center w-full max-w-xl mx-auto lg:mx-0 bg-white dark:bg-stone-900 border-2 border-emerald-500/40 dark:border-emerald-600/50 focus-within:border-emerald-600 rounded-2xl shadow-xl p-2 transition-all"
+                className="relative flex items-center w-full max-w-2xl bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-2 border-emerald-500/50 focus-within:border-emerald-400 rounded-2xl shadow-2xl p-2 transition-all"
               >
                 <div className="pl-3 text-stone-400">
-                  <Search className="h-6 w-6 text-emerald-700 dark:text-emerald-400" />
+                  <Search className="h-6 w-6 text-emerald-600" />
                 </div>
                 <input
                   type="text"
                   name="crop"
                   placeholder="अपनी फसल या मंडी खोजें... (उदा. गेहूं, सोयाबीन, लहसुन)"
-                  className="w-full pl-3 pr-4 py-3 bg-transparent text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none text-base md:text-lg min-h-[48px] font-medium"
+                  className="w-full pl-3 pr-4 py-3 bg-transparent text-stone-900 dark:text-white placeholder-stone-400 focus:outline-none text-base md:text-lg min-h-[48px] font-semibold"
                   aria-label="Search crop or mandi"
                 />
                 <button
@@ -148,46 +150,46 @@ export default function Home() {
                   <ArrowRight className="h-5 w-5 hidden sm:inline" />
                 </button>
               </form>
+
             </div>
 
-            {/* Right Seamless Visual Hero Card */}
-            <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative w-full max-w-md aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 group">
-                <Image
-                  src="/images/farmer_hero.jpg"
-                  alt="KisanSathi Farmer"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 500px"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent flex flex-col justify-end p-6 text-white space-y-1">
-                  <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black uppercase tracking-wider">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>सत्यापित कृषि पोर्टल</span>
-                  </div>
-                  <h3 className="font-extrabold text-xl text-white">सशक्त किसान, समृद्ध भारत</h3>
+            {/* Glassmorphism Feature Card */}
+            <div className="lg:col-span-4 hidden lg:block">
+              <div className="bg-white/10 dark:bg-stone-900/40 backdrop-blur-xl border border-white/20 dark:border-stone-700/40 rounded-3xl p-6 text-white space-y-4 shadow-2xl">
+                <div className="flex items-center gap-2 text-emerald-400 text-xs font-black uppercase tracking-wider">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>विश्वसनीय मानक</span>
+                </div>
+                <h3 className="text-2xl font-bold leading-snug">
+                  सत्यापित मंडी भाव व उपग्रह मौसम सेवा
+                </h3>
+                <p className="text-stone-300 text-sm leading-relaxed">
+                  कृषि मंत्रालय (Agmarknet) डेटाबेस से सीधे सिंक किया गया प्रमाणित डेटा।
+                </p>
+                <div className="pt-2 flex items-center gap-3 text-xs font-extrabold text-stone-200">
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">100% नि:शुल्क</span>
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">24x7 अपडेट</span>
                 </div>
               </div>
             </div>
 
           </div>
 
-          {/* Live Quick Stats Bar */}
-          <div className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          {/* Stats Overlay Bar */}
+          <div className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl">
             {stats.map((st) => (
               <div
                 key={st.label}
-                className="bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border border-stone-200 dark:border-stone-800 p-4 rounded-2xl shadow-xs flex items-center gap-3 text-left"
+                className="bg-stone-900/80 backdrop-blur-md border border-stone-800 p-4 rounded-2xl shadow-lg flex items-center gap-3 text-left"
               >
-                <div className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 shrink-0">
+                <div className="p-2.5 rounded-xl bg-stone-800 shrink-0">
                   {st.icon}
                 </div>
                 <div>
-                  <div className="text-xl md:text-2xl font-black text-stone-900 dark:text-white">
+                  <div className="text-xl md:text-2xl font-black text-white">
                     {st.val}
                   </div>
-                  <div className="text-xs font-bold text-stone-500">
+                  <div className="text-xs font-bold text-stone-400">
                     {st.label}
                   </div>
                 </div>
@@ -198,7 +200,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. ELEGANT HARMONIOUS MODULE CARDS GRID */}
+      {/* 2. CORE MODULES GRID - CLEAN & ELEGANT */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider border border-emerald-200">
@@ -215,14 +217,14 @@ export default function Home() {
             <Link
               key={m.href}
               href={m.href}
-              className={`p-6 rounded-3xl ${m.bgGradient} border ${m.borderColor} shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden`}
+              className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3.5 rounded-2xl bg-white dark:bg-stone-900 shadow-sm group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-2xl bg-stone-100 dark:bg-stone-800 group-hover:scale-110 transition-transform">
                     {m.icon}
                   </div>
-                  <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${m.accentBadge}`}>
+                  <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border ${m.accentBg}`}>
                     {m.badge}
                   </span>
                 </div>
@@ -231,7 +233,7 @@ export default function Home() {
                   <h3 className="text-xl font-extrabold text-stone-900 dark:text-white">
                     {m.titleHi}
                   </h3>
-                  <p className="text-xs font-bold text-stone-500 uppercase tracking-wider">
+                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">
                     {m.titleEn}
                   </p>
                 </div>
@@ -407,7 +409,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. FARMER TESTIMONIALS SECTION WITH MATCHING AVATARS */}
+      {/* 5. FARMER TESTIMONIALS SECTION */}
       <section className="py-16 bg-gradient-to-b from-white to-kisan-cream-50 dark:from-stone-900/30 dark:to-stone-950 border-t border-stone-200 dark:border-stone-850">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center space-y-2">
