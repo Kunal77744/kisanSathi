@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { BadgeCheck, Globe, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import { motion } from "framer-motion";
 import { MandiPrice } from "@prisma/client";
 import {
   translateCrop,
@@ -9,7 +12,6 @@ import {
 } from "@/lib/cropTranslations";
 import { SITE_URL } from "@/lib/config";
 import { slugify } from "@/lib/utils";
-
 import { getAdvisoryLabel } from "@/lib/mandiQueries";
 
 interface PriceCardProps {
@@ -40,7 +42,13 @@ export default function PriceCard({ record, trend }: PriceCardProps) {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
   return (
-    <div className="card-kisan flex flex-col justify-between hover:scale-[1.01] transition-transform duration-200">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="card-kisan flex flex-col justify-between"
+    >
       <div className="space-y-4">
         {/* Card Header */}
         <div className="flex items-start justify-between gap-2">
@@ -148,7 +156,7 @@ export default function PriceCard({ record, trend }: PriceCardProps) {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 font-bold border border-green-150 dark:border-green-900/30 active:scale-95 transition-all text-xs"
+          className="flex items-center gap-1 px-3 py-2 rounded-xl bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 font-bold border border-green-150 dark:border-green-900/30 active:scale-95 transition-all text-xs min-h-[36px]"
           title="व्हाट्सएप पर शेयर करें"
         >
           <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
@@ -157,6 +165,6 @@ export default function PriceCard({ record, trend }: PriceCardProps) {
           <span>शेयर</span>
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -6,6 +6,7 @@ import Footer from "@/components/shared/Footer";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Analytics } from "@vercel/analytics/react";
 import { SITE_URL, SUPPORT_EMAIL } from "@/lib/config";
+import { Toaster } from "sonner";
 import PostHogAnalyticsProvider from "@/components/analytics/PostHogAnalyticsProvider";
 
 // Configure Poppins font for English layout
@@ -132,6 +133,7 @@ export default function RootLayout({
 
             <Footer />
             <Analytics />
+            <Toaster position="bottom-right" richColors />
           </ThemeProvider>
         </PostHogAnalyticsProvider>
       </body>

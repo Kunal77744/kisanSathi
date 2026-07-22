@@ -9,6 +9,7 @@ import { slugify } from "@/lib/utils";
 import { getMandiPrices } from "@/lib/mandiQueries";
 import PriceCard from "@/components/mandi-bhav/PriceCard";
 import districtsData from "@/data/india-districts.json";
+import MandiPriceChart from "@/components/mandi-bhav/MandiPriceChart";
 
 
 
@@ -265,6 +266,11 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             selectedCrop={selectedCrop}
             selectedDate={selectedDate}
           />
+        )}
+
+        {/* 7-Day Price Trend Graph */}
+        {!isDbEmpty && priceRecords.length > 0 && (
+          <MandiPriceChart records={priceRecords} />
         )}
 
         {/* Date Title Banner */}

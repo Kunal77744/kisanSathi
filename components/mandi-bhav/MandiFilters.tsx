@@ -2,13 +2,15 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, X, Home, Globe, Calendar } from "lucide-react";
+import { Search, MapPin, X, Home, Globe, Calendar, Filter } from "lucide-react";
 import {
   translateCrop,
   translateDistrict,
   translateMandi,
   translateState,
 } from "@/lib/cropTranslations";
+import VoiceSearchButton from "@/components/mandi-bhav/VoiceSearchButton";
+import { toast } from "sonner";
 
 interface MandiFiltersProps {
   states: string[];
@@ -49,42 +51,23 @@ export default function MandiFilters({
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
-      const value = `${yyyy}-${mm}-${dd}`;
+      const dateIso = `${yyyy}-${mm}-${dd}`;
       
-      let label = "";
-      if (i === 0) {
-        label = `आज (${d.getDate()} ${monthsHindi[d.getMonth()]})`;
-      } else if (i === 1) {
-        label = `कल (${d.getDate()} ${monthsHindi[d.getMonth()]})`;
-      } else {
-        label = `${d.getDate()} ${monthsHindi[d.getMonth()]} ${yyyy}`;
-      }
-      
-      dates.push({ value, label });
-    }
+      let label = `${d.getDate()} ${monthsHindi[d.getMonth()]}`;
+      if (i === 0) label = `आज (${d.getDate()} ${monthsHindi[d.getMonth()]})`;
+      if (i === 1) label = `कल (${d.getDate()} ${monthsHindi[d.getMonth()]})`;
 
-    // If selectedDate is not within the recent 7 days, add it dynamically so the select has it as a valid option
-    const found = dates.some((d) => d.value === selectedDate);
-    if (!found && selectedDate) {
-      const parts = selectedDate.split("-").map(Number);
-      if (parts.length === 3 && !isNaN(parts[0])) {
-        const [y, m, d] = parts;
-        dates.push({
-          value: selectedDate,
-          label: `${d} ${monthsHindi[m - 1] || ""} ${y}`,
-        });
-      }
+      dates.push({ dateIso, label });
     }
-
     return dates;
   };
 
-  // 1. Filter available districts based on selected state
+  const recentDates = getRecentDates();
+
   const availableDistricts = selectedState
     ? districts.filter((d) => d.state.toLowerCase() === selectedState.toLowerCase())
     : [];
 
-  // 2. Filter available mandis based on selected district
   const availableMandis = selectedDistrict
     ? mandis.filter((m) => m.district.toLowerCase() === selectedDistrict.toLowerCase())
     : [];
@@ -98,7 +81,6 @@ export default function MandiFilters({
   ) => {
     const params = new URLSearchParams();
 
-    // If state changes, reset children (district, mandi)
     const stateChanged = state.toLowerCase() !== selectedState.toLowerCase();
     
     if (state) {
@@ -108,7 +90,6 @@ export default function MandiFilters({
     if (district && !stateChanged) {
       params.set("district", district);
       
-      // If district is same, keep mandi selection
       const districtChanged = district.toLowerCase() !== selectedDistrict.toLowerCase();
       if (mandi && !districtChanged) {
         params.set("mandi", mandi);
@@ -127,11 +108,75 @@ export default function MandiFilters({
   };
 
   const handleReset = () => {
+    toast.info("फ़िल्टर रीसेट कर दिए गए हैं।");
     router.push("/mandi-bhav");
   };
 
+  const handleVoiceSearchResult = (text: string) => {
+    const cleanText = text.toLowerCase().trim();
+
+    let matchedCrop = "";
+    let matchedDistrict = "";
+    let matchedState = "";
+
+    // Search crop match
+    for (const c of crops) {
+      const hiTranslation = translateCrop(c, "hi").toLowerCase();
+      if (cleanText.includes(c.toLowerCase()) || cleanText.includes(hiTranslation)) {
+        matchedCrop = c;
+        break;
+      }
+    }
+
+    // Search district match
+    for (const d of districts) {
+      const hiDist = translateDistrict(d.district, "hi").toLowerCase();
+      if (cleanText.includes(d.district.toLowerCase()) || cleanText.includes(hiDist)) {
+        matchedDistrict = d.district;
+        matchedState = d.state;
+        break;
+      }
+    }
+
+    // Search state match if no district matched
+    if (!matchedState) {
+      for (const st of states) {
+        const hiState = translateState(st, "hi").toLowerCase();
+        if (cleanText.includes(st.toLowerCase()) || cleanText.includes(hiState)) {
+          matchedState = st;
+          break;
+        }
+      }
+    }
+
+    if (matchedCrop || matchedDistrict || matchedState) {
+      toast.success(`फ़िल्टर लागू किया जा रहा है...`);
+      handleFilterChange(
+        matchedState || selectedState,
+        matchedDistrict || selectedDistrict,
+        selectedMandi,
+        matchedCrop || selectedCrop,
+        selectedDate
+      );
+    } else {
+      toast.warning(`"${text}" के लिए कोई फ़सल या स्थान मेल नहीं खाया। कृपया पुन: प्रयास करें।`);
+    }
+  };
+
   return (
-    <div className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm space-y-4">
+    <div className="bg-white dark:bg-stone-900 border border-kisan-cream-200 dark:border-kisan-green-900/20 rounded-3xl p-6 shadow-sm space-y-5">
+      {/* Header Bar with Voice Search */}
+      <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-850 pb-3 gap-2">
+        <div className="flex items-center gap-2">
+          <Filter className="h-5 w-5 text-kisan-green-700 dark:text-kisan-green-400" />
+          <h2 className="text-base font-extrabold text-stone-800 dark:text-stone-100">
+            मंडी फ़िल्टर व खोज (Filters & Search)
+          </h2>
+        </div>
+
+        <VoiceSearchButton onSpeechResult={handleVoiceSearchResult} />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
         {/* 1. State Dropdown */}
         <div className="space-y-1.5">
@@ -179,20 +224,16 @@ export default function MandiFilters({
               disabled={!selectedState}
               value={selectedDistrict}
               onChange={(e) => handleFilterChange(selectedState, e.target.value, "", selectedCrop, selectedDate)}
-              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 min-h-[48px] text-base cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] text-base cursor-pointer appearance-none"
             >
-              {!selectedState ? (
-                <option value="">पहले राज्य चुनें...</option>
-              ) : (
-                <>
-                  <option value="">सभी जिले (All Districts)</option>
-                  {availableDistricts.map((d) => (
-                    <option key={d.district} value={d.district}>
-                      {translateDistrict(d.district, "hi")} ({d.district})
-                    </option>
-                  ))}
-                </>
-              )}
+              <option value="">
+                {selectedState ? "सभी जिले (All Districts)" : "पहले राज्य चुनें"}
+              </option>
+              {availableDistricts.map((d) => (
+                <option key={d.district} value={d.district}>
+                  {translateDistrict(d.district, "hi")} ({d.district})
+                </option>
+              ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
               <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
@@ -209,7 +250,7 @@ export default function MandiFilters({
             className="text-sm font-bold text-stone-700 dark:text-stone-300 flex items-center gap-1.5"
           >
             <Home className="h-4.5 w-4.5 text-kisan-green-700" />
-            <span>मंडी (Mandi)</span>
+            <span>मंडी (Market)</span>
           </label>
           <div className="relative">
             <select
@@ -217,20 +258,16 @@ export default function MandiFilters({
               disabled={!selectedDistrict}
               value={selectedMandi}
               onChange={(e) => handleFilterChange(selectedState, selectedDistrict, e.target.value, selectedCrop, selectedDate)}
-              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 min-h-[48px] text-base cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] text-base cursor-pointer appearance-none"
             >
-              {!selectedDistrict ? (
-                <option value="">पहले जिला चुनें...</option>
-              ) : (
-                <>
-                  <option value="">सभी मंडियां (All Mandis)</option>
-                  {availableMandis.map((m) => (
-                    <option key={m.mandi} value={m.mandi}>
-                      {translateMandi(m.mandi, "hi")} ({m.mandi})
-                    </option>
-                  ))}
-                </>
-              )}
+              <option value="">
+                {selectedDistrict ? "सभी मंडियां (All Mandis)" : "पहले जिला चुनें"}
+              </option>
+              {availableMandis.map((m) => (
+                <option key={m.mandi} value={m.mandi}>
+                  {translateMandi(m.mandi, "hi")} ({m.mandi})
+                </option>
+              ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
               <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
@@ -257,9 +294,9 @@ export default function MandiFilters({
               className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 min-h-[48px] text-base cursor-pointer appearance-none"
             >
               <option value="">सभी फसलें (All Crops)</option>
-              {crops.map((cr) => (
-                <option key={cr} value={cr}>
-                  {translateCrop(cr, "hi")} ({cr})
+              {crops.map((c) => (
+                <option key={c} value={c}>
+                  {translateCrop(c, "hi")} ({c})
                 </option>
               ))}
             </select>
@@ -271,7 +308,7 @@ export default function MandiFilters({
           </div>
         </div>
 
-        {/* 5. Date Dropdown Filter */}
+        {/* 5. Date Selector */}
         <div className="space-y-1.5">
           <label
             htmlFor="date"
@@ -284,20 +321,12 @@ export default function MandiFilters({
             <select
               id="date"
               value={selectedDate}
-              onChange={(e) =>
-                handleFilterChange(
-                  selectedState,
-                  selectedDistrict,
-                  selectedMandi,
-                  selectedCrop,
-                  e.target.value
-                )
-              }
-              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 min-h-[48px] text-base cursor-pointer appearance-none"
+              onChange={(e) => handleFilterChange(selectedState, selectedDistrict, selectedMandi, selectedCrop, e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-850 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-white focus:outline-none focus:border-kisan-green-700 min-h-[48px] text-base cursor-pointer appearance-none font-bold"
             >
-              {getRecentDates().map((dt) => (
-                <option key={dt.value} value={dt.value}>
-                  {dt.label}
+              {recentDates.map((item) => (
+                <option key={item.dateIso} value={item.dateIso}>
+                  {item.label}
                 </option>
               ))}
             </select>
@@ -310,16 +339,63 @@ export default function MandiFilters({
         </div>
       </div>
 
-      {/* Reset Filter Button */}
-      {(selectedState || selectedDistrict || selectedMandi || selectedCrop || selectedDate) && (
-        <div className="flex justify-end pt-2">
+      {/* Active Filters Bar & Reset */}
+      {(selectedState || selectedDistrict || selectedMandi || selectedCrop) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-100 dark:border-stone-850 text-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-stone-500">सक्रिय फ़िल्टर:</span>
+            {selectedState && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-800 dark:text-kisan-green-300 font-extrabold text-xs border border-kisan-green-200">
+                {translateState(selectedState, "hi")}
+                <button
+                  onClick={() => handleFilterChange("", "", "", selectedCrop, selectedDate)}
+                  className="hover:text-red-500 ml-1"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {selectedDistrict && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-800 dark:text-kisan-green-300 font-extrabold text-xs border border-kisan-green-200">
+                {translateDistrict(selectedDistrict, "hi")}
+                <button
+                  onClick={() => handleFilterChange(selectedState, "", "", selectedCrop, selectedDate)}
+                  className="hover:text-red-500 ml-1"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {selectedMandi && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-800 dark:text-kisan-green-300 font-extrabold text-xs border border-kisan-green-200">
+                {translateMandi(selectedMandi, "hi")}
+                <button
+                  onClick={() => handleFilterChange(selectedState, selectedDistrict, "", selectedCrop, selectedDate)}
+                  className="hover:text-red-500 ml-1"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {selectedCrop && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-800 dark:text-kisan-green-300 font-extrabold text-xs border border-kisan-green-200">
+                {translateCrop(selectedCrop, "hi")}
+                <button
+                  onClick={() => handleFilterChange(selectedState, selectedDistrict, selectedMandi, "", selectedDate)}
+                  className="hover:text-red-500 ml-1"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+          </div>
+
           <button
             onClick={handleReset}
-            className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-750 dark:text-stone-300 font-semibold transition-colors duration-200 flex items-center justify-center gap-2 min-h-[44px] cursor-pointer text-sm border border-stone-200 dark:border-stone-750"
-            aria-label="Reset filters"
+            className="text-xs font-extrabold text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 min-h-[36px]"
           >
-            <X className="h-4.5 w-4.5" />
-            <span>फ़िल्टर हटाएं</span>
+            <X className="h-3.5 w-3.5" />
+            <span>फ़िल्टर हटाएं (Reset)</span>
           </button>
         </div>
       )}
