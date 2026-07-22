@@ -24,7 +24,7 @@ import {
 
 export const metadata = {
   title: "आज का मंडी भाव (Mandi Bhav Today), मौसम & PM Kisan | किसान साथी",
-  description: "किसान साथी (KisanSathi) पर 36 राज्यों की 1,000+ मंडियों के आज के लाइव भाव (Mandi Rates), 7-दिवसीय मौसम पूर्वानुमान, PM-Kisan सम्मान निधि और 50+ फसलों की सरकारी दरें देखें।",
+  description: "किसान साथी (KisanSathi) पर 36 राज्यों की 1,000+ मंडियों के आज के लाइव भाव (Mandi Rates), 7-दिवसीय मौसम पूर्वानुमान, PM-Kisan सम्मान निधि 23वीं किस्त और 50+ फसलों की सरकारी दरें देखें।",
   keywords: [
     "आज का मंडी भाव",
     "mandi bhav today",
@@ -69,7 +69,7 @@ export default function Home() {
       icon: <MessageSquareText className="h-8 w-8 text-purple-700 dark:text-purple-400" />,
       titleHi: "किसान साथी AI",
       titleEn: "Kisan Sathi AI",
-      descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7एं।",
+      descHi: "अपनी भाषा में सवाल पूछें — फसल रोग, खाद और उपचार की सलाह 24x7 पाएं।",
       href: "/kisan-sathi",
       badge: "24x7 असिस्टेंट",
       accentBg: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300",
@@ -221,7 +221,8 @@ export default function Home() {
                   alt="KisanSathi Smart Agriculture 3D Vector"
                   fill
                   priority
-                  sizes="(max-width: 768px) 100vw, 500px"
+                  quality={80}
+                  sizes="(max-width: 768px) 100vw, 400px"
                   className="object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
@@ -243,7 +244,7 @@ export default function Home() {
                   <div className="text-xl md:text-2xl font-black text-stone-900 dark:text-white">
                     {st.val}
                   </div>
-                  <div className="text-xs font-bold text-stone-500">
+                  <div className="text-xs font-bold text-stone-600 dark:text-stone-400">
                     {st.label}
                   </div>
                 </div>
@@ -312,7 +313,7 @@ export default function Home() {
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-amber-600 font-extrabold text-xs uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-extrabold text-xs uppercase tracking-wider">
                 <Clock className="h-4 w-4" />
                 <span>लाइव बुलेटिन (Live Bulletin)</span>
               </div>
@@ -335,18 +336,18 @@ export default function Home() {
             {/* Wheat Teaser */}
             <div className="bg-stone-50 dark:bg-stone-950 p-6 rounded-3xl border border-stone-200 dark:border-stone-850 space-y-4 shadow-2xs">
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
-                <span className="text-xs font-bold text-stone-500">इंदौर मंडी</span>
+                <span className="text-xs font-bold text-stone-600 dark:text-stone-400">इंदौर मंडी</span>
                 <span className="text-xs font-extrabold bg-green-100 text-green-800 px-2 py-0.5 rounded-md flex items-center gap-0.5">
                   <TrendingUp className="h-3 w-3" /> +₹50
                 </span>
               </div>
               <div>
-                <h4 className="text-2xl font-extrabold text-stone-900 dark:text-white">गेहूं (Wheat)</h4>
+                <h3 className="text-2xl font-extrabold text-stone-900 dark:text-white">गेहूं (Wheat)</h3>
                 <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mt-1">
-                  ₹2,800 <span className="text-sm font-normal text-stone-500">/क्विंटल</span>
+                  ₹2,800 <span className="text-sm font-normal text-stone-600 dark:text-stone-400">/क्विंटल</span>
                 </p>
               </div>
-              <div className="text-xs font-semibold text-stone-500 flex items-center gap-1 pt-1">
+              <div className="text-xs font-semibold text-stone-600 dark:text-stone-400 flex items-center gap-1 pt-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                 <span>Agmarknet Verified Source</span>
               </div>
@@ -355,18 +356,18 @@ export default function Home() {
             {/* Garlic Teaser */}
             <div className="bg-stone-50 dark:bg-stone-950 p-6 rounded-3xl border border-stone-200 dark:border-stone-850 space-y-4 shadow-2xs">
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
-                <span className="text-xs font-bold text-stone-500">मंदसौर मंडी</span>
+                <span className="text-xs font-bold text-stone-600 dark:text-stone-400">मंदसौर मंडी</span>
                 <span className="text-xs font-extrabold bg-green-100 text-green-800 px-2 py-0.5 rounded-md flex items-center gap-0.5">
                   <TrendingUp className="h-3 w-3" /> +₹200
                 </span>
               </div>
               <div>
-                <h4 className="text-2xl font-extrabold text-stone-900 dark:text-white">लहसुन (Garlic)</h4>
+                <h3 className="text-2xl font-extrabold text-stone-900 dark:text-white">लहसुन (Garlic)</h3>
                 <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mt-1">
-                  ₹11,000 <span className="text-sm font-normal text-stone-500">/क्विंटल</span>
+                  ₹11,000 <span className="text-sm font-normal text-stone-600 dark:text-stone-400">/क्विंटल</span>
                 </p>
               </div>
-              <div className="text-xs font-semibold text-stone-500 flex items-center gap-1 pt-1">
+              <div className="text-xs font-semibold text-stone-600 dark:text-stone-400 flex items-center gap-1 pt-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                 <span>उच्च गुणवत्ता भाव</span>
               </div>
@@ -379,7 +380,7 @@ export default function Home() {
                 <CloudSun className="h-4 w-4 text-sky-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-stone-900 dark:text-white">750+ जिलों का पूर्वानुमान</h4>
+                <h3 className="text-xl font-extrabold text-stone-900 dark:text-white">750+ जिलों का पूर्वानुमान</h3>
                 <p className="text-xs font-medium text-stone-600 dark:text-stone-300 mt-1">
                   बारिश की सटीक संभावना और सिंचाई सलाह देखें।
                 </p>
@@ -400,7 +401,7 @@ export default function Home() {
                 <Award className="h-4 w-4 text-amber-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-stone-900 dark:text-white">PM-KISAN 23वीं किस्त</h4>
+                <h3 className="text-xl font-extrabold text-stone-900 dark:text-white">PM-KISAN 23वीं किस्त</h3>
                 <p className="text-xs font-medium text-stone-600 dark:text-stone-300 mt-1">
                   किस्त का डायरेक्ट स्टेटस चेक करें।
                 </p>
@@ -483,7 +484,7 @@ export default function Home() {
                 className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-2 shadow-2xs"
               >
                 <h3 className="text-lg font-bold text-stone-900 dark:text-white flex items-center gap-2">
-                  <span className="text-emerald-600 font-extrabold">Q.</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">Q.</span>
                   <span>{faq.q}</span>
                 </h3>
                 <p className="text-stone-600 dark:text-stone-300 text-sm leading-relaxed pl-6">

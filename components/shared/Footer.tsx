@@ -36,7 +36,7 @@ export default function Footer() {
                 KisanSathi
               </span>
             </div>
-            <p className="text-stone-400 text-base leading-relaxed">
+            <p className="text-stone-300 text-base leading-relaxed">
               Empowering Indian farmers with real-time digital agricultural tools, mandi rates, climate advisories, and government scheme updates in their local language.
             </p>
           </div>
@@ -51,9 +51,9 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-stone-400 hover:text-kisan-green-400 transition-colors duration-200 text-base flex items-center gap-1.5"
+                    className="text-stone-300 hover:text-kisan-green-400 transition-colors duration-200 text-base flex items-center gap-1.5"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-kisan-green-600"></span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-kisan-green-500"></span>
                     {link.label}
                   </Link>
                 </li>
@@ -73,9 +73,9 @@ export default function Footer() {
                     href={resource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-stone-400 hover:text-kisan-green-400 transition-colors duration-200 text-base flex items-center gap-1.5 group"
+                    className="text-stone-300 hover:text-kisan-green-400 transition-colors duration-200 text-base flex items-center gap-1.5 group"
                   >
-                    <ExternalLink className="h-4 w-4 text-stone-500 group-hover:text-kisan-green-400" />
+                    <ExternalLink className="h-4 w-4 text-stone-400 group-hover:text-kisan-green-400" />
                     {resource.name}
                   </a>
                 </li>
@@ -91,19 +91,19 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-kisan-green-500 mt-0.5 shrink-0" />
-                <span className="text-stone-400 text-base">
+                <span className="text-stone-300 text-base">
                   KisanSathi Support Center, Krishi Bhavan, New Delhi, India - 110001
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-kisan-green-500 shrink-0" />
-                <span className="text-stone-400 text-base">+91 1800-180-1551</span>
+                <span className="text-stone-300 text-base">+91 1800-180-1551</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-kisan-green-500 shrink-0" />
                 <a
                   href={`mailto:${SUPPORT_EMAIL}`}
-                  className="break-all rounded-sm text-base text-stone-400 transition-colors duration-200 hover:text-kisan-green-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kisan-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
+                  className="break-all rounded-sm text-base text-stone-300 transition-colors duration-200 hover:text-kisan-green-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kisan-green-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
                 >
                   {SUPPORT_EMAIL}
                 </a>
@@ -114,7 +114,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-stone-800 pt-8 mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-stone-500 text-sm md:justify-start">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-stone-300 text-sm md:justify-start">
             <p className="text-center md:text-left">
               &copy; {currentYear} KisanSathi. Designed for Indian Farmers. All rights reserved.
             </p>
@@ -122,7 +122,7 @@ export default function Footer() {
               href="https://tin.computer"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 hover:text-stone-400 transition-colors"
+              className="inline-flex items-center gap-1.5 hover:text-stone-200 transition-colors"
             >
               <svg
                 aria-hidden="true"
@@ -134,9 +134,9 @@ export default function Footer() {
               Growth by Tin
             </a>
           </div>
-          <div className="flex gap-6 text-sm text-stone-500">
-            <Link href="/privacy" className="hover:text-stone-400 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-stone-400 transition-colors">Terms of Service</Link>
+          <div className="flex gap-6 text-sm text-stone-300">
+            <Link href="/privacy" className="hover:text-stone-200 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-stone-200 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
