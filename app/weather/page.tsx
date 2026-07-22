@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { CloudSun, ChevronRight, Sprout, MapPin } from "lucide-react";
+import Image from "next/image";
+import { ChevronRight, Sprout, MapPin, Sparkles } from "lucide-react";
 import districtsData from "@/data/india-districts.json";
 import { slugify } from "@/lib/utils";
 import GlobalWeatherSearch from "@/components/weather/GlobalWeatherSearch";
@@ -11,22 +12,45 @@ export const metadata = {
 };
 
 export default function WeatherLandingPage() {
-  // Extract unique states and sort them alphabetically
   const states = Array.from(new Set(districtsData.map((item) => item.state))).sort();
 
   return (
     <div className="flex-grow bg-kisan-cream-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
-        {/* Header Block */}
-        <div className="border-b border-kisan-cream-200 dark:border-kisan-green-900/10 pb-6 space-y-2">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-kisan-green-800 dark:text-kisan-green-400 flex items-center gap-2.5">
-            <CloudSun className="h-9 w-9 text-kisan-green-700" />
-            <span>मौसम पूर्वानुमान - कृषि मौसम सेवा / Weather Forecast</span>
-          </h1>
-          <p className="text-stone-605 dark:text-stone-400 text-base md:text-lg">
-            भारत के सभी राज्यों और जिलों का सटीक मौसम पूर्वानुमान एवं किसानों के लिए विशेष कृषि मौसम सलाह।
-          </p>
+        {/* Visual Hero Header */}
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-3xl p-6 sm:p-8 shadow-sm overflow-hidden relative">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            <div className="md:col-span-7 space-y-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 font-extrabold text-xs border border-sky-200">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>उपग्रह मौसम सेवा (Satellite Agriculture Weather)</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white">
+                🌤️ मौसम पूर्वानुमान — कृषि मौसम सलाह (Weather Forecast)
+              </h1>
+              
+              <p className="text-base sm:text-lg text-stone-600 dark:text-stone-300 font-medium leading-relaxed">
+                भारत के सभी 36 राज्यों व संघ क्षेत्रों और 750+ जिलों का सटीक मौसम पूर्वानुमान, बारिश अलर्ट और सिंचाई सलाह।
+              </p>
+            </div>
+
+            <div className="md:col-span-5 relative">
+              <div className="relative w-full h-52 rounded-2xl overflow-hidden shadow-md border-2 border-stone-100 dark:border-stone-800">
+                <Image
+                  src="/images/weather_banner.png"
+                  alt="Weather Forecast Banner"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 400px"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+
+          </div>
         </div>
 
         {/* 2-Column Grid: Global Search + States Index */}
@@ -61,14 +85,14 @@ export default function WeatherLandingPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {states.map((state) => (
+              {states.map((st) => (
                 <Link
-                  key={state}
-                  href={`/weather/${slugify(state)}`}
-                  className="p-4 rounded-2xl bg-stone-50 hover:bg-kisan-green-50/50 dark:bg-stone-950 dark:hover:bg-kisan-green-950/20 text-stone-705 dark:text-stone-300 hover:text-kisan-green-800 dark:hover:text-kisan-green-400 border border-stone-200/50 dark:border-stone-850/50 transition-all font-semibold flex items-center justify-between group min-h-[48px]"
+                  key={st}
+                  href={`/weather/${slugify(st)}`}
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-stone-50 hover:bg-kisan-green-50 dark:bg-stone-950 dark:hover:bg-stone-850 border border-stone-200 dark:border-stone-850 hover:border-kisan-green-300 transition-all text-sm font-bold text-stone-800 dark:text-stone-200 group min-h-[44px]"
                 >
-                  <span>{state}</span>
-                  <ChevronRight className="h-4 w-4 text-stone-400 group-hover:text-kisan-green-700 group-hover:translate-x-0.5 transition-all shrink-0" />
+                  <span>{st}</span>
+                  <ChevronRight className="h-4 w-4 text-stone-400 group-hover:text-kisan-green-700 group-hover:translate-x-1 transition-all" />
                 </Link>
               ))}
             </div>
