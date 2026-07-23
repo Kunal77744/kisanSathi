@@ -220,7 +220,6 @@ export default function Home() {
                   src="/images/home_hero_vector.png"
                   alt="KisanSathi Smart Agriculture 3D Vector"
                   fill
-                  priority
                   quality={70}
                   sizes="(max-width: 640px) 320px, (max-width: 768px) 450px, 400px"
                   className="object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
