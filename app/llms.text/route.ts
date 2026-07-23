@@ -1,41 +1,28 @@
 import { NextResponse } from "next/server";
 
-const llmsContent = `# KisanSathi (किसान साथी) - Digital Agriculture Portal for Indian Farmers
+const llmsContent = `# KisanSathi (किसान साथी)
 
-KisanSathi is India's leading digital agriculture web platform providing real-time mandi rates (Mandi Bhav), 7-day weather forecasts, government scheme information, agricultural news, and an AI crop advisory assistant for farmers across all 36 Indian States and Union Territories.
+> KisanSathi is India's leading digital agriculture portal providing real-time mandi rates (Agmarknet Live), 7-day satellite weather forecasts, government scheme updates (PM-Kisan, PMFBY, KCC), agricultural news, and AI crop disease diagnosis for farmers across all 36 Indian States and Union Territories.
 
-## Primary Services & Capabilities
+## Core Features
 
-1. **Mandi Bhav (मंडी भाव - Live Market Rates)**
-   - Official Agmarknet data integration updated daily.
-   - Covers 1,000+ mandis and 50+ crops across India (Wheat, Soybean, Garlic, Paddy, Gram, Onion, Tomato, Mustard, Cotton, etc.).
-   - Interactive 7-day price history graphs and price trend indicators.
-   - State-wise, district-wise, and crop-wise dedicated landing pages.
+- [Mandi Bhav (मंडी भाव - Live Market Rates)](https://ekisansaathi.vercel.app/mandi-bhav): Live agricultural market prices updated daily from 1,000+ mandis and 50+ crops across India with 7-day trend graphs.
+- [Weather Forecast (मौसम पूर्वानुमान)](https://ekisansaathi.vercel.app/weather): District-wise 7-day satellite weather forecasts and irrigation advisories for 750+ districts.
+- [Government Schemes (सरकारी योजनाएं)](https://ekisansaathi.vercel.app/schemes): Comprehensive guide for PM-Kisan Samman Nidhi (23rd installment status check), PM Fasal Bima Yojana, Kisan Credit Card (KCC), and PM-KUSUM.
+- [KisanSathi AI Assistant (किसान साथी AI)](https://ekisansaathi.vercel.app/kisan-sathi): 24x7 multi-lingual AI assistant for crop disease photo diagnosis, pesticide dosages, and agricultural guidance.
+- [Agri News & Advisories (कृषि समाचार)](https://ekisansaathi.vercel.app/news): Latest agricultural research, scientific crop advisories, and farming news.
 
-2. **Weather Forecast (मौसम पूर्वानुमान)**
-   - Satellite-backed 7-day weather forecast for 750+ districts.
-   - Irrigation advice, rain alerts, temperature warnings, and agricultural advisory.
+## Optional Resources
 
-3. **Government Schemes (सरकारी योजनाएं)**
-   - Direct information on PM-Kisan Samman Nidhi (23rd installment status check), PM Fasal Bima Yojana (PMFBY), Kisan Credit Card (KCC), PM-KUSUM Solar Scheme, Soil Health Card, and e-NAM.
-
-4. **KisanSathi AI Assistant (किसान साथी AI)**
-   - 24x7 Hindi AI agriculture guide for crop disease identification, pesticide recommendation, fertilizer dosage, and farming best practices.
-
-5. **Hindi Voice Search (बोलकर खोजें)**
-   - Native Web Speech API integration supporting Hindi voice queries (e.g., "इंदौर गेहूं भाव").
-
-## Canonical Domain & Contact
-- Website: https://ekisansaathi.vercel.app
-- Language: Hindi (हिन्दी) & English
-- Target Region: India (सभी 36 राज्य व केंद्र शासित प्रदेश)
+- [Sitemap](https://ekisansaathi.vercel.app/sitemap.xml): Full XML sitemap listing all 160+ dynamic state, district, crop, scheme, and weather pages.
+- [Robots Configuration](https://ekisansaathi.vercel.app/robots.txt): Official crawler access instructions for search engines and AI agents.
 `;
 
 export async function GET() {
   return new NextResponse(llmsContent, {
     status: 200,
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Type": "text/markdown; charset=utf-8",
       "Cache-Control": "public, max-age=86400, s-maxage=86400",
     },
   });
