@@ -52,11 +52,9 @@ export default function PriceCard({ record, trend }: PriceCardProps) {
       <div className="space-y-4">
         {/* Card Header */}
         <div className="flex items-start justify-between gap-2">
-          <div>
-            <h3 className="text-2xl font-extrabold text-kisan-green-800 dark:text-kisan-green-400">
+            <div className="text-2xl font-extrabold text-kisan-green-800 dark:text-kisan-green-400">
               {cropHi}
-            </h3>
-          </div>
+            </div>
 
           {isManualVerified ? (
             <div className="bg-kisan-green-50 dark:bg-kisan-green-950/40 text-kisan-green-700 dark:text-kisan-green-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-kisan-green-100 dark:border-kisan-green-900/30 shrink-0">

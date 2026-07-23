@@ -152,9 +152,9 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
   const selectedView = searchParams.view === "table" ? "table" : "card";
   const selectedDate = searchParams.date || getTodayLocalDateString();
   
-  // Parse page number and set page size limit
+  // Parse page number and set page size limit (18 items for optimal DOM size <1500 and speed)
   const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10));
-  const pageSize = 30;
+  const pageSize = 18;
   
   // 2. Fetch price records matching filter criteria via shared getMandiPrices query logic
   const { priceRecords, totalMatchingCount, totalPages, isDbEmpty } = await getMandiPrices({
