@@ -134,7 +134,9 @@ export default function Footer() {
               Growth by Tin
             </a>
           </div>
-          <div className="flex gap-6 text-sm text-stone-300">
+          <div className="flex flex-wrap gap-4 text-sm text-stone-300">
+            <Link href="/about" className="hover:text-stone-200 transition-colors">About Us (हमारे बारे में)</Link>
+            <Link href="/contact" className="hover:text-stone-200 transition-colors">Contact Us (संपर्क करें)</Link>
             <Link href="/privacy" className="hover:text-stone-200 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-stone-200 transition-colors">Terms of Service</Link>
           </div>

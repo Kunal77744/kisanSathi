@@ -139,6 +139,7 @@ export default function RootLayout({
     <html lang="hi" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="KisanSathi LLM Context" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}

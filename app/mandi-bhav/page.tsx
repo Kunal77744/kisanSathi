@@ -18,10 +18,17 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "आज का मंडी भाव (Mandi Bhav Today) - 36 राज्य & 1000+ मंडियां | किसान साथी",
+  title: "आज का मंडी भाव (Mandi Bhav Today) | किसान साथी",
   description: "भारत की सभी 1,000+ मंडियों के आज के ताज़ा फसल भाव, गेहूं, सोयाबीन, लहसुन, चना, प्याज की दरें और 7-दिवसीय लाइव ट्रेंड ग्राफ देखें।",
   alternates: {
     canonical: "https://ekisansaathi.vercel.app/mandi-bhav",
+  },
+  openGraph: {
+    title: "आज का मंडी भाव (Mandi Bhav Today) | किसान साथी",
+    description: "भारत की सभी 1,000+ मंडियों के आज के ताज़ा फसल भाव और लाइव दरें।",
+    url: "https://ekisansaathi.vercel.app/mandi-bhav",
+    siteName: "KisanSathi",
+    images: [{ url: "https://ekisansaathi.vercel.app/images/og-image.png", width: 1200, height: 630 }],
   },
 };
 
@@ -454,6 +461,35 @@ export default async function MandiBhavPage({ searchParams }: PageProps) {
             )}
           </div>
         )}
+
+        {/* Rich Informational Content Section for Text-to-HTML Ratio & SEO Depth */}
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+          <h2 className="text-2xl font-extrabold text-stone-900 dark:text-white">
+            🌾 भारत में कृषि मंडी भाव एवं Agmarknet लाइव दरें गाइड
+          </h2>
+          <div className="prose dark:prose-invert max-w-none text-stone-600 dark:text-stone-300 text-sm leading-relaxed space-y-4">
+            <p>
+              किसान साथी (KisanSathi) भारत का प्रमुख डिजिटल कृषि पोर्टल है जो देश भर की 1,000 से अधिक कृषि उपज मंडियों (Krishi Upaj Mandi) के ताज़ा फसल भाव प्रतिदिन प्रत्यक्ष रूप से उपलब्ध कराता है। हमारा पोर्टल भारत सरकार के कृषि एवं किसान कल्याण मंत्रालय के अधिकृत डाटाबेस <strong>Agmarknet (कृषि विपणन एवं सूचना नेटवर्क)</strong> से नियमित सिंक रहता है, जिससे प्रदर्शित दरें 100% प्रामाणिक और विश्वसनीय होती हैं।
+            </p>
+            <h3 className="text-lg font-bold text-stone-900 dark:text-white">
+              मंडी में फसल ले जाने से पहले ध्यान रखने योग्य मुख्य बिंदु:
+            </h3>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>
+                <strong>नमी की मात्रा (Moisture Content):</strong> अनाज या दलहन (गेहूं, चना, सोयाबीन) मंडी ले जाने से पहले सही तरीके से सुखाएं। 12% से कम नमी रहने पर मंडी में उच्चतम या प्रचलित भाव (Modal Price) मिलने की संभावना अधिक रहती है।
+              </li>
+              <li>
+                <strong>ग्रेडिंग व सफाई (Grading & Quality):</strong> फसल में से कचरा, मिट्टी और क्षतिग्रस्त दानों को बीनकर अलग करें। ग्रेड-A गुणवत्ता की उपज पर व्यापारियों और खरीदारों द्वारा न्यूनतम समर्थन मूल्य (MSP) से भी अधिक बोली लगाई जाती है।
+              </li>
+              <li>
+                <strong>7-दिवसीय लाइव ट्रेंड ग्राफ:</strong> किसान साथी पोर्टल पर दिए गए 7 दिनों के मूल्य ग्राफ (Price Trend Chart) का अध्ययन करें। इससे आपको यह समझने में मदद मिलेगी कि आने वाले दिनों में बाजार की मांग और आवक (Arrivals) का रुझान क्या रहने वाला है।
+              </li>
+            </ul>
+            <p>
+              हमारा लक्ष्य मध्यप्रदेश (इंदौर, भोपाल, मंदसौर, उज्जैन, नीमच, धार, देवास), महाराष्ट्र (पुणे, नासिक, नागपुर), उत्तर प्रदेश, पंजाब, हरियाणा और राजस्थान सहित भारत के सभी 36 राज्यों व केंद्र शासित प्रदेशों के किसानों को घर बैठे सटीक बाजार भाव और न्यूनतम समर्थन मूल्य (MSP) का लाभ पहुंचाना है।
+            </p>
+          </div>
+        </div>
 
         {/* SEO Navigation & Discovery Links */}
         <div className="border-t border-kisan-cream-200 dark:border-kisan-green-900/10 pt-10 mt-12 space-y-8 select-none animate-fade-in">
