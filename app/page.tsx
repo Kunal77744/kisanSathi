@@ -495,6 +495,42 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 6. HOMEPAGE RICH INFORMATIONAL TEXT CONTENT SECTION FOR TEXT-TO-HTML RATIO & SEO DEPTH */}
+      <section className="py-12 bg-kisan-cream-100 dark:bg-stone-950 border-t border-stone-200 dark:border-stone-850">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-850 rounded-3xl p-6 sm:p-10 space-y-6 shadow-xs">
+            <h2 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-white">
+              🌾 किसान साथी — डिजिटल कृषि गाइड व मंडी सूचना केंद्र
+            </h2>
+            <div className="prose dark:prose-invert max-w-none text-stone-600 dark:text-stone-300 text-sm sm:text-base leading-relaxed space-y-4 font-medium">
+              <p>
+                किसान साथी (KisanSathi) भारत के किसानों के लिए समर्पित एक प्रमुख डिजिटल कृषि सूचना पोर्टल है। हमारा उद्देश्य देश के सभी 36 राज्यों और केंद्र शासित प्रदेशों के 750 से अधिक जिलों में कृषि क्षेत्र की नवीनतम तकनीकों, मंडी दरों (Mandi Bhav), मौसम अलर्ट, और सरकारी योजनाओं की सटीक जानकारी प्रदान करना है।
+              </p>
+              <h3 className="text-lg font-bold text-stone-900 dark:text-white">
+                मुख्य सेवाएं एवं डिजिटल सुविधाएं:
+              </h3>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>
+                  <strong>Agmarknet आधारित लाइव मंडी भाव:</strong> गेहूं, सोयाबीन, चना, प्याज, लहसुन, धान और कपास सहित 50 से अधिक फसलों के आज के उच्चतम, न्यूनतम और औसत बाजार भाव।
+                </li>
+                <li>
+                  <strong>उपग्रह आधारित 7-दिवसीय मौसम पूर्वानुमान:</strong> वर्षा की संभावना, तापमान और तेज हवाओं की चेतावनी ताकि किसान समय पर सिंचाई और फसल कटाई का निर्णय ले सकें।
+                </li>
+                <li>
+                  <strong>24x7 किसान साथी AI सहायक:</strong> बहुभाषी AI चैटबॉट जो फसलों की बीमारियों की फोटो पहचान, जैविक कीट नियंत्रण, और खाद की सही मात्रा की सिफारिश करता है।
+                </li>
+                <li>
+                  <strong>सरकारी योजनाएं:</strong> PM-Kisan सम्मान निधि (23वीं किस्त स्टेटस), प्रधानमंत्री फसल बीमा योजना (PMFBY), किसान क्रेडिट कार्ड (KCC), और PM-KUSUM सोलर पंप योजना की पूर्ण जानकारी।
+                </li>
+              </ul>
+              <p>
+                किसान साथी पोर्टल भारत सरकार के कृषि एवं किसान कल्याण मंत्रालय के अधिकृत आंकड़ों पर आधारित है और किसानों के लिए हमेशा 100% नि:शुल्क उपलब्ध है।
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

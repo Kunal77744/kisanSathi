@@ -100,6 +100,18 @@ export default function RootLayout({
     "name": "KisanSathi",
     "url": SITE_URL,
     "logo": `${SITE_URL}/images/og-image.png`,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Krishi Bhavan",
+      "addressLocality": "New Delhi",
+      "addressCountry": "IN",
+      "postalCode": "110001",
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "KisanSathi Agricultural Advisory Board",
+    },
+    "publishingPrinciples": `${SITE_URL}/about`,
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+91-1800-180-1551",
